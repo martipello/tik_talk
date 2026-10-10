@@ -9,7 +9,11 @@ import '../../../../core/theme/dial_face_style.dart';
 import '../../providers/timer_state.dart';
 import '../../providers/timer_status.dart';
 
-const _glowColor = Color(0xFF9FE870);
+// Backlight glow is a brightened tint of the dial's own accent color, so it
+// always harmonizes with whatever theme is picked, rather than a fixed hue
+// that can clash with the chosen accent (e.g. a fixed green against a blue
+// theme).
+Color _glowColorFor(Color accentColor) => Color.lerp(accentColor, Colors.white, 0.45)!;
 
 class WatchFace extends StatelessWidget {
   const WatchFace({
@@ -72,7 +76,7 @@ class _ClassicStopwatchFace extends StatelessWidget {
     final isCountingDown = timerState.status == TimerStatus.countingDown;
     final faceColor = isDark ? const Color(0xFF3A3A3D) : const Color(0xFFF7F4EC);
     final tickColor = isDark ? Colors.white : Colors.black;
-    final readoutColor = isGlowing ? _glowColor : accentColor;
+    final readoutColor = isGlowing ? _glowColorFor(accentColor) : accentColor;
 
     return CustomPaint(
       painter: _StopwatchFacePainter(
@@ -204,7 +208,7 @@ class _StopwatchFacePainter extends CustomPainter {
     _paintOuterNotches(canvas, center, radius);
     _paintBezel(canvas, center, radius);
 
-    final handColor = isGlowing ? _glowColor : accentColor;
+    final handColor = isGlowing ? _glowColorFor(accentColor) : accentColor;
 
     _paintDial(canvas, center: center, radius: radius - 18, tickCount: 60, majorEvery: 5);
     _paintHand(
@@ -267,7 +271,7 @@ class _StopwatchFacePainter extends CustomPainter {
 
   void _paintGlow(Canvas canvas, Offset center, double radius) {
     final glowPaint = Paint()
-      ..color = _glowColor.withValues(alpha: 0.55)
+      ..color = _glowColorFor(accentColor).withValues(alpha: 0.55)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     canvas.drawCircle(center, radius + 2, glowPaint);
   }
@@ -288,7 +292,11 @@ class _StopwatchFacePainter extends CustomPainter {
     canvas.drawCircle(center, faceRadius, Paint()..color = faceColor);
 
     if (isGlowing) {
-      canvas.drawCircle(center, faceRadius, Paint()..color = _glowColor.withValues(alpha: 0.22));
+      canvas.drawCircle(
+        center,
+        faceRadius,
+        Paint()..color = _glowColorFor(accentColor).withValues(alpha: 0.22),
+      );
     }
 
     final vignettePaint = Paint()
@@ -417,13 +425,14 @@ class _FluidGlassFace extends StatelessWidget {
   Widget build(BuildContext context) {
     final secondsIntoMinute = timerState.elapsed.inMilliseconds % 60000;
     final fillLevel = secondsIntoMinute / 60000;
-    final color = isGlowing ? _glowColor : accentColor;
+    final glowColor = _glowColorFor(accentColor);
+    final color = isGlowing ? glowColor : accentColor;
 
     return DecoratedBox(
       decoration: isGlowing
           ? BoxDecoration(
               shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: _glowColor.withValues(alpha: 0.6), blurRadius: 6)],
+              boxShadow: [BoxShadow(color: glowColor.withValues(alpha: 0.6), blurRadius: 6)],
             )
           : const BoxDecoration(),
       child: LiquidCircularProgressIndicator(

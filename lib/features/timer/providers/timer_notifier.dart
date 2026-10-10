@@ -15,7 +15,7 @@ part 'timer_notifier.g.dart';
 class TimerNotifier extends _$TimerNotifier {
   Timer? _ticker;
   Timer? _countdownTicker;
-  Duration _lastAnnounced = Duration.zero;
+  int _lastAnnouncedIntervalCount = 0;
 
   @override
   TimerState build() {
@@ -102,7 +102,7 @@ class TimerNotifier extends _$TimerNotifier {
 
   void _beginRunning() {
     state = state.copyWith(status: TimerStatus.running, countdownSecondsRemaining: 0);
-    _lastAnnounced = state.elapsed;
+    _lastAnnouncedIntervalCount = _currentIntervalCount();
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(milliseconds: 100), (_) => _tick());
   }
@@ -112,15 +112,23 @@ class TimerNotifier extends _$TimerNotifier {
     _announceIfNeeded();
   }
 
+  // Announcements land on absolute elapsed-time boundaries (1:00, 2:00, ...)
+  // rather than "interval since last spoken" - otherwise resuming a session
+  // partway into an interval (e.g. at 0:16) would permanently offset every
+  // future announcement by that amount (1:16, 2:16, ...) instead of landing
+  // on the minute.
   void _announceIfNeeded() {
-    final interval = ref.read(settingsNotifierProvider).voiceAnnounceInterval.duration;
-    if (interval == null) return;
+    final currentIntervalCount = _currentIntervalCount();
+    if (currentIntervalCount <= _lastAnnouncedIntervalCount) return;
 
-    final sinceLastAnnounced = (state.elapsed - _lastAnnounced).abs();
-    if (sinceLastAnnounced < interval) return;
-
-    _lastAnnounced = state.elapsed;
+    _lastAnnouncedIntervalCount = currentIntervalCount;
     unawaited(ref.read(ttsServiceProvider).speak(_announceText(state.elapsed)));
+  }
+
+  int _currentIntervalCount() {
+    final interval = ref.read(settingsNotifierProvider).voiceAnnounceInterval.duration;
+    if (interval == null) return 0;
+    return state.elapsed.inMilliseconds ~/ interval.inMilliseconds;
   }
 
   String _announceText(Duration duration) {
