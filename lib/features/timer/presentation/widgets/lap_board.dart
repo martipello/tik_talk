@@ -41,6 +41,7 @@ class LapBoard extends StatelessWidget {
                 return _LapRow(
                   record: record,
                   accentColor: accentColor,
+                  numberColor: colorScheme.onSurface,
                   totalColor: colorScheme.onSurfaceVariant,
                   isFastest: hasVariation && record.split == fastestSplit,
                   isSlowest: hasVariation && record.split == slowestSplit,
@@ -53,11 +54,19 @@ class LapBoard extends StatelessWidget {
     );
   }
 
+  // Splits are derived from each lap's *whole-second-rounded* total, rather
+  // than subtracting the raw (sub-second-precision) Durations directly.
+  // Otherwise the split and total columns are each rounded independently
+  // when formatted, and can visibly fail to add up (e.g. totals of 0:10 and
+  // 0:16 next to a split that rounds to 0:05, instead of the 0:06 that
+  // would actually make 10 + 6 = 16).
   List<_LapRecord> _buildRecords() {
     final records = <_LapRecord>[];
+    var previousTotal = Duration.zero;
     for (var i = 0; i < laps.length; i++) {
-      final previousTotal = i > 0 ? laps[i - 1] : Duration.zero;
-      records.add(_LapRecord(lapNumber: i + 1, split: laps[i] - previousTotal, total: laps[i]));
+      final total = Duration(seconds: (laps[i].inMilliseconds / 1000).round());
+      records.add(_LapRecord(lapNumber: i + 1, split: total - previousTotal, total: total));
+      previousTotal = total;
     }
     return records;
   }
@@ -89,7 +98,8 @@ class _LapBoardHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Row(
         children: [
-          SizedBox(width: 32, child: Text('LAP', style: style)),
+          SizedBox(width: 20, child: Text('LAP', style: style)),
+          const SizedBox(width: 16),
           Expanded(child: Text('SPLIT', style: style)),
           Text('TOTAL', style: style),
         ],
@@ -102,6 +112,7 @@ class _LapRow extends StatelessWidget {
   const _LapRow({
     required this.record,
     required this.accentColor,
+    required this.numberColor,
     required this.totalColor,
     required this.isFastest,
     required this.isSlowest,
@@ -109,6 +120,7 @@ class _LapRow extends StatelessWidget {
 
   final _LapRecord record;
   final Color accentColor;
+  final Color numberColor;
   final Color totalColor;
   final bool isFastest;
   final bool isSlowest;
@@ -123,41 +135,45 @@ class _LapRow extends StatelessWidget {
       (_, true) => _slowestColor,
       _ => accentColor,
     };
-    final onAccentColor =
-        ThemeData.estimateBrightnessForColor(accentColor) == Brightness.dark
-            ? Colors.white
-            : Colors.black;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       child: Row(
         children: [
           SizedBox(
-            width: 32,
-            child: CircleAvatar(
-              radius: 12,
-              backgroundColor: accentColor,
-              child: Text(
-                '${record.lapNumber}',
-                style: TextStyle(color: onAccentColor, fontSize: 11, fontWeight: FontWeight.bold),
-              ),
+            width: 20,
+            child: Text(
+              '${record.lapNumber}',
+              style: TextStyle(color: numberColor, fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ),
+          const SizedBox(width: 16),
           Expanded(
-            child: SevenSegmentDisplay(
-              value: record.split.formattedClock,
-              size: 1.6,
-              characterSpacing: 2,
-              backgroundColor: Colors.transparent,
-              segmentStyle: DefaultSegmentStyle(
-                enabledColor: splitColor,
-                disabledColor: splitColor.withValues(alpha: 0.14),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: SevenSegmentDisplay(
+                  value: record.split.formattedClock,
+                  size: 3.2,
+                  characterSpacing: 3,
+                  backgroundColor: Colors.transparent,
+                  segmentStyle: DefaultSegmentStyle(
+                    enabledColor: splitColor,
+                    disabledColor: splitColor.withValues(alpha: 0.14),
+                  ),
+                ),
               ),
             ),
           ),
           Text(
             record.total.formattedClock,
-            style: TextStyle(color: totalColor, fontFeatures: const [FontFeature.tabularFigures()]),
+            style: TextStyle(
+              color: totalColor,
+              fontSize: 14,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
         ],
       ),
