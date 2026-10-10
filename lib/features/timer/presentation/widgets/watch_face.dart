@@ -30,21 +30,23 @@ class WatchFace extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final size = math.min(constraints.maxWidth, constraints.maxHeight);
-        return SizedBox(
-          width: size,
-          height: size,
-          child: switch (dialFaceStyle) {
-            DialFaceStyle.classicStopwatch => _ClassicStopwatchFace(
-                timerState: timerState,
-                accentColor: accentColor,
-                isGlowing: isGlowing,
-              ),
-            DialFaceStyle.fluidGlass => _FluidGlassFace(
-                timerState: timerState,
-                accentColor: accentColor,
-                isGlowing: isGlowing,
-              ),
-          },
+        return ClipRect(
+          child: SizedBox(
+            width: size,
+            height: size,
+            child: switch (dialFaceStyle) {
+              DialFaceStyle.classicStopwatch => _ClassicStopwatchFace(
+                  timerState: timerState,
+                  accentColor: accentColor,
+                  isGlowing: isGlowing,
+                ),
+              DialFaceStyle.fluidGlass => _FluidGlassFace(
+                  timerState: timerState,
+                  accentColor: accentColor,
+                  isGlowing: isGlowing,
+                ),
+            },
+          ),
         );
       },
     );
@@ -266,8 +268,8 @@ class _StopwatchFacePainter extends CustomPainter {
   void _paintGlow(Canvas canvas, Offset center, double radius) {
     final glowPaint = Paint()
       ..color = _glowColor.withValues(alpha: 0.55)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 24);
-    canvas.drawCircle(center, radius + 10, glowPaint);
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
+    canvas.drawCircle(center, radius + 2, glowPaint);
   }
 
   void _paintCaseBody(Canvas canvas, Offset center, double radius) {
@@ -421,7 +423,7 @@ class _FluidGlassFace extends StatelessWidget {
       decoration: isGlowing
           ? BoxDecoration(
               shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: _glowColor.withValues(alpha: 0.6), blurRadius: 28, spreadRadius: 6)],
+              boxShadow: [BoxShadow(color: _glowColor.withValues(alpha: 0.6), blurRadius: 6)],
             )
           : const BoxDecoration(),
       child: LiquidCircularProgressIndicator(
