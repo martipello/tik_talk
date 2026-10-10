@@ -130,6 +130,7 @@ class _HistoryCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
+      clipBehavior: Clip.antiAlias,
       child: ListTile(
         onTap: onTap,
         onLongPress: onLongPress,
