@@ -199,8 +199,8 @@ class _StopwatchFacePainter extends CustomPainter {
   static const _margin = 13.0;
   static const _subDialRadiusFactor = 0.10;
   static const _subDialDistanceFactor = 0.5;
-  static const _minutesDialClockAngleDegrees = 35.0;
-  static const _runningDialClockAngleDegrees = 85.0;
+  static const _minutesDialClockAngleDegrees = 30.0;
+  static const _runningDialClockAngleDegrees = 75.0;
   static const _outerNotchCount = 48;
   static const _caseColor = Color(0xFF2B2B2E);
 
