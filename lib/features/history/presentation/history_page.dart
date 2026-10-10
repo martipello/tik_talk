@@ -41,12 +41,8 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
     _clearSelection();
   }
 
-  Future<void> _resumeSession(TimerSession session) async {
-    final id = session.id;
+  void _resumeSession(TimerSession session) {
     ref.read(timerNotifierProvider.notifier).resumeSession(session);
-    if (id != null) {
-      await ref.read(historyNotifierProvider.notifier).deleteSession(id);
-    }
     if (!mounted) return;
     context.go('/timer');
   }
@@ -68,7 +64,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
       body: ViewConstraint(
         child: sessionsAsync.when(
           data: (sessions) => sessions.isEmpty
-              ? const Center(child: Text('No sessions yet'))
+              ? const _EmptyHistory()
               : ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   itemCount: sessions.length,
@@ -91,6 +87,26 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
           error: (error, stackTrace) => Center(child: Text('Failed to load history: $error')),
           loading: () => const Center(child: CircularProgressIndicator()),
         ),
+      ),
+    );
+  }
+}
+
+class _EmptyHistory extends StatelessWidget {
+  const _EmptyHistory();
+
+  @override
+  Widget build(BuildContext context) {
+    final mutedColor = Theme.of(context).colorScheme.onSurfaceVariant;
+
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.hourglass_empty, size: 56, color: mutedColor),
+          const SizedBox(height: 12),
+          Text('No sessions yet', style: TextStyle(color: mutedColor)),
+        ],
       ),
     );
   }

@@ -10,16 +10,34 @@ import '../providers/timer_state.dart';
 import '../providers/timer_status.dart';
 import 'widgets/watch_face.dart';
 
-class TimerPage extends ConsumerWidget {
+class TimerPage extends ConsumerStatefulWidget {
   const TimerPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TimerPage> createState() => _TimerPageState();
+}
+
+class _TimerPageState extends ConsumerState<TimerPage> {
+  bool _isGlowing = false;
+
+  void _toggleGlow() => setState(() => _isGlowing = !_isGlowing);
+
+  @override
+  Widget build(BuildContext context) {
     final timerState = ref.watch(timerNotifierProvider);
     final settings = ref.watch(settingsNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('TikTalk')),
+      appBar: AppBar(
+        title: const Text('TikTalk'),
+        actions: [
+          IconButton(
+            icon: Icon(_isGlowing ? Icons.lightbulb : Icons.lightbulb_outline),
+            tooltip: 'Backlight',
+            onPressed: _toggleGlow,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: ViewConstraint(
           child: Column(
@@ -30,6 +48,7 @@ class TimerPage extends ConsumerWidget {
                     timerState: timerState,
                     dialFaceStyle: settings.dialFaceStyle,
                     accentColor: settings.dialAccentColor.value,
+                    isGlowing: _isGlowing,
                   ),
                 ),
               ),

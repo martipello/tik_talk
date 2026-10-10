@@ -11,13 +11,14 @@ class TikTalkWearApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsNotifierProvider);
+    final accentColor = settings.dialAccentColor.value;
 
     return MaterialApp(
       title: 'TikTalk Wear',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
-      theme: AppTheme.dark(settings.dialAccentColor.value),
-      darkTheme: AppTheme.dark(settings.dialAccentColor.value),
+      theme: AppTheme.dark(accentColor),
+      darkTheme: AppTheme.dark(accentColor),
       home: const WearTimerScreen(),
     );
   }
