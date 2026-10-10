@@ -162,13 +162,22 @@ class _CountdownDigit extends StatelessWidget {
           child: ScaleTransition(scale: scale, child: child),
         );
       },
-      child: Text(
-        '$value',
+      child: SizedBox(
         key: ValueKey(value),
-        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              color: accentColor,
-              fontWeight: FontWeight.bold,
+        width: 150,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: SevenSegmentDisplay(
+            value: '$value',
+            size: 9,
+            characterSpacing: 4,
+            backgroundColor: Colors.transparent,
+            segmentStyle: DefaultSegmentStyle(
+              enabledColor: accentColor,
+              disabledColor: accentColor.withValues(alpha: 0.14),
             ),
+          ),
+        ),
       ),
     );
   }
@@ -183,7 +192,11 @@ class _StopwatchFacePainter extends CustomPainter {
     required this.isGlowing,
   });
 
-  static const _margin = 10.0;
+  // Needs to be wide enough for the drop shadow's blur (sigma 10, so it
+  // fades over ~3x that) to trail off naturally before hitting the
+  // ClipRect edge in WatchFace - too tight and the blur gets cut off with a
+  // visible hard edge instead of fading out.
+  static const _margin = 30.0;
   static const _subDialRadiusFactor = 0.10;
   static const _subDialDistanceFactor = 0.5;
   static const _minutesDialClockAngleDegrees = 35.0;
