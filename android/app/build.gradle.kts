@@ -42,6 +42,10 @@ android {
             dimension = "environment"
             resValue(type = "string", name = "app_name", value = "TikTalk")
         }
+        create("wear") {
+            dimension = "environment"
+            resValue(type = "string", name = "app_name", value = "TikTalk Wear")
+        }
     }
 
     buildTypes {

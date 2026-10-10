@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        flavor: [dev, prod]
+        flavor: [dev, prod, wear]
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -36,7 +36,7 @@ jobs:
       - run: flutter build apk --flavor ${{ matrix.flavor }} -t lib/main_${{ matrix.flavor }}.dart --release
       - uses: actions/upload-artifact@v4
         with:
-          name: app-${{ matrix.flavor }}-release
+          name: tik-talk-${{ matrix.flavor }}-release
           path: build/app/outputs/flutter-apk/app-${{ matrix.flavor }}-release.apk
 
   build-web:
