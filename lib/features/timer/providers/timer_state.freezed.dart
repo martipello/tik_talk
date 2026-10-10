@@ -18,10 +18,9 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$TimerState {
   TimerStatus get status => throw _privateConstructorUsedError;
-  TimerMode get mode => throw _privateConstructorUsedError;
   Duration get elapsed => throw _privateConstructorUsedError;
   List<Duration> get laps => throw _privateConstructorUsedError;
-  Duration get countdownFrom => throw _privateConstructorUsedError;
+  int get countInSecondsRemaining => throw _privateConstructorUsedError;
 
   /// Create a copy of TimerState
   /// with the given fields replaced by the non-null parameter values.
@@ -39,10 +38,9 @@ abstract class $TimerStateCopyWith<$Res> {
   @useResult
   $Res call({
     TimerStatus status,
-    TimerMode mode,
     Duration elapsed,
     List<Duration> laps,
-    Duration countdownFrom,
+    int countInSecondsRemaining,
   });
 }
 
@@ -62,10 +60,9 @@ class _$TimerStateCopyWithImpl<$Res, $Val extends TimerState>
   @override
   $Res call({
     Object? status = null,
-    Object? mode = null,
     Object? elapsed = null,
     Object? laps = null,
-    Object? countdownFrom = null,
+    Object? countInSecondsRemaining = null,
   }) {
     return _then(
       _value.copyWith(
@@ -73,10 +70,6 @@ class _$TimerStateCopyWithImpl<$Res, $Val extends TimerState>
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
                       as TimerStatus,
-            mode: null == mode
-                ? _value.mode
-                : mode // ignore: cast_nullable_to_non_nullable
-                      as TimerMode,
             elapsed: null == elapsed
                 ? _value.elapsed
                 : elapsed // ignore: cast_nullable_to_non_nullable
@@ -85,10 +78,10 @@ class _$TimerStateCopyWithImpl<$Res, $Val extends TimerState>
                 ? _value.laps
                 : laps // ignore: cast_nullable_to_non_nullable
                       as List<Duration>,
-            countdownFrom: null == countdownFrom
-                ? _value.countdownFrom
-                : countdownFrom // ignore: cast_nullable_to_non_nullable
-                      as Duration,
+            countInSecondsRemaining: null == countInSecondsRemaining
+                ? _value.countInSecondsRemaining
+                : countInSecondsRemaining // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -106,10 +99,9 @@ abstract class _$$TimerStateImplCopyWith<$Res>
   @useResult
   $Res call({
     TimerStatus status,
-    TimerMode mode,
     Duration elapsed,
     List<Duration> laps,
-    Duration countdownFrom,
+    int countInSecondsRemaining,
   });
 }
 
@@ -128,10 +120,9 @@ class __$$TimerStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? status = null,
-    Object? mode = null,
     Object? elapsed = null,
     Object? laps = null,
-    Object? countdownFrom = null,
+    Object? countInSecondsRemaining = null,
   }) {
     return _then(
       _$TimerStateImpl(
@@ -139,10 +130,6 @@ class __$$TimerStateImplCopyWithImpl<$Res>
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
                   as TimerStatus,
-        mode: null == mode
-            ? _value.mode
-            : mode // ignore: cast_nullable_to_non_nullable
-                  as TimerMode,
         elapsed: null == elapsed
             ? _value.elapsed
             : elapsed // ignore: cast_nullable_to_non_nullable
@@ -151,10 +138,10 @@ class __$$TimerStateImplCopyWithImpl<$Res>
             ? _value._laps
             : laps // ignore: cast_nullable_to_non_nullable
                   as List<Duration>,
-        countdownFrom: null == countdownFrom
-            ? _value.countdownFrom
-            : countdownFrom // ignore: cast_nullable_to_non_nullable
-                  as Duration,
+        countInSecondsRemaining: null == countInSecondsRemaining
+            ? _value.countInSecondsRemaining
+            : countInSecondsRemaining // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -165,16 +152,13 @@ class __$$TimerStateImplCopyWithImpl<$Res>
 class _$TimerStateImpl implements _TimerState {
   const _$TimerStateImpl({
     required this.status,
-    required this.mode,
     required this.elapsed,
     required final List<Duration> laps,
-    required this.countdownFrom,
+    required this.countInSecondsRemaining,
   }) : _laps = laps;
 
   @override
   final TimerStatus status;
-  @override
-  final TimerMode mode;
   @override
   final Duration elapsed;
   final List<Duration> _laps;
@@ -186,11 +170,11 @@ class _$TimerStateImpl implements _TimerState {
   }
 
   @override
-  final Duration countdownFrom;
+  final int countInSecondsRemaining;
 
   @override
   String toString() {
-    return 'TimerState(status: $status, mode: $mode, elapsed: $elapsed, laps: $laps, countdownFrom: $countdownFrom)';
+    return 'TimerState(status: $status, elapsed: $elapsed, laps: $laps, countInSecondsRemaining: $countInSecondsRemaining)';
   }
 
   @override
@@ -199,21 +183,22 @@ class _$TimerStateImpl implements _TimerState {
         (other.runtimeType == runtimeType &&
             other is _$TimerStateImpl &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.elapsed, elapsed) || other.elapsed == elapsed) &&
             const DeepCollectionEquality().equals(other._laps, _laps) &&
-            (identical(other.countdownFrom, countdownFrom) ||
-                other.countdownFrom == countdownFrom));
+            (identical(
+                  other.countInSecondsRemaining,
+                  countInSecondsRemaining,
+                ) ||
+                other.countInSecondsRemaining == countInSecondsRemaining));
   }
 
   @override
   int get hashCode => Object.hash(
     runtimeType,
     status,
-    mode,
     elapsed,
     const DeepCollectionEquality().hash(_laps),
-    countdownFrom,
+    countInSecondsRemaining,
   );
 
   /// Create a copy of TimerState
@@ -228,22 +213,19 @@ class _$TimerStateImpl implements _TimerState {
 abstract class _TimerState implements TimerState {
   const factory _TimerState({
     required final TimerStatus status,
-    required final TimerMode mode,
     required final Duration elapsed,
     required final List<Duration> laps,
-    required final Duration countdownFrom,
+    required final int countInSecondsRemaining,
   }) = _$TimerStateImpl;
 
   @override
   TimerStatus get status;
   @override
-  TimerMode get mode;
-  @override
   Duration get elapsed;
   @override
   List<Duration> get laps;
   @override
-  Duration get countdownFrom;
+  int get countInSecondsRemaining;
 
   /// Create a copy of TimerState
   /// with the given fields replaced by the non-null parameter values.

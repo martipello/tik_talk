@@ -24,7 +24,6 @@ class SqfliteHistorySessionStore implements HistorySessionStore {
       onCreate: (database, version) => database.execute('''
         CREATE TABLE sessions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
-          mode TEXT NOT NULL,
           completed_at TEXT NOT NULL,
           duration_ms INTEGER NOT NULL,
           laps_ms TEXT NOT NULL

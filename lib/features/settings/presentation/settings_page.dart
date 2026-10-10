@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/theme/dial_theme.dart';
+import '../../../core/widgets/view_constraint.dart';
 import '../providers/settings_notifier.dart';
 import '../providers/voice_announce_interval.dart';
 
@@ -15,54 +16,66 @@ class SettingsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: ListView(
-        children: [
-          SwitchListTile(
-            title: const Text('Dark mode'),
-            value: settings.themeMode == ThemeMode.dark,
-            onChanged: (isDark) =>
-                notifier.updateThemeMode(isDark ? ThemeMode.dark : ThemeMode.light),
-          ),
-          ListTile(
-            title: const Text('Watch face'),
-            trailing: DropdownButton<DialTheme>(
+      body: ViewConstraint(
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          children: [
+            SwitchListTile(
+              title: const Text('Dark mode'),
+              value: settings.themeMode == ThemeMode.dark,
+              onChanged: (isDark) =>
+                  notifier.updateThemeMode(isDark ? ThemeMode.dark : ThemeMode.light),
+            ),
+            const SizedBox(height: 16),
+            _SettingDropdown<DialTheme>(
+              label: 'Watch face',
               value: settings.dialTheme,
-              items: DialTheme.values
-                  .map((theme) => DropdownMenuItem(value: theme, child: Text(theme.displayName)))
-                  .toList(),
-              onChanged: (theme) {
-                if (theme != null) notifier.updateDialTheme(theme);
-              },
+              entries: DialTheme.values,
+              labelOf: (theme) => theme.displayName,
+              onSelected: notifier.updateDialTheme,
             ),
-          ),
-          ListTile(
-            title: const Text('Voice announcements'),
-            trailing: DropdownButton<VoiceAnnounceInterval>(
+            const SizedBox(height: 16),
+            _SettingDropdown<VoiceAnnounceInterval>(
+              label: 'Voice announcements',
               value: settings.voiceAnnounceInterval,
-              items: VoiceAnnounceInterval.values
-                  .map(
-                    (interval) => DropdownMenuItem(value: interval, child: Text(interval.label)),
-                  )
-                  .toList(),
-              onChanged: (interval) {
-                if (interval != null) notifier.updateVoiceAnnounceInterval(interval);
-              },
+              entries: VoiceAnnounceInterval.values,
+              labelOf: (interval) => interval.label,
+              onSelected: notifier.updateVoiceAnnounceInterval,
             ),
-          ),
-          ListTile(
-            title: const Text('Countdown from'),
-            trailing: DropdownButton<int>(
-              value: settings.countdownFromSeconds,
-              items: const [10, 20, 30, 60]
-                  .map((seconds) => DropdownMenuItem(value: seconds, child: Text('${seconds}s')))
-                  .toList(),
-              onChanged: (seconds) {
-                if (seconds != null) notifier.updateCountdownFromSeconds(seconds);
-              },
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class _SettingDropdown<T> extends StatelessWidget {
+  const _SettingDropdown({
+    required this.label,
+    required this.value,
+    required this.entries,
+    required this.labelOf,
+    required this.onSelected,
+  });
+
+  final String label;
+  final T value;
+  final List<T> entries;
+  final String Function(T value) labelOf;
+  final ValueChanged<T> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu<T>(
+      label: Text(label),
+      initialSelection: value,
+      expandedInsets: EdgeInsets.zero,
+      onSelected: (selected) {
+        if (selected != null) onSelected(selected);
+      },
+      dropdownMenuEntries: entries
+          .map((entry) => DropdownMenuEntry(value: entry, label: labelOf(entry)))
+          .toList(),
     );
   }
 }

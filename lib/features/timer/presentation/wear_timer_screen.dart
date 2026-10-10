@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../providers/timer_mode.dart';
+import '../../../core/extensions/duration_extension.dart';
 import '../providers/timer_notifier.dart';
 import '../providers/timer_state.dart';
 import '../providers/timer_status.dart';
@@ -20,7 +20,9 @@ class WearTimerScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _formatDuration(timerState.displayDuration),
+                timerState.status == TimerStatus.countingIn
+                    ? timerState.countInSecondsRemaining.toString()
+                    : timerState.elapsed.formattedClock,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 12),
@@ -30,12 +32,6 @@ class WearTimerScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _formatDuration(Duration duration) {
-    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return '$minutes:$seconds';
   }
 }
 
@@ -52,9 +48,12 @@ class _WearControls extends ConsumerWidget {
       TimerStatus.idle => IconButton(
           iconSize: 36,
           icon: const Icon(Icons.play_arrow),
-          onPressed: timerState.mode == TimerMode.countdown
-              ? notifier.startCountdownTimer
-              : notifier.start,
+          onPressed: notifier.start,
+        ),
+      TimerStatus.countingIn => IconButton(
+          iconSize: 36,
+          icon: const Icon(Icons.close),
+          onPressed: notifier.stop,
         ),
       TimerStatus.running => Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -69,11 +68,6 @@ class _WearControls extends ConsumerWidget {
             IconButton(iconSize: 28, icon: const Icon(Icons.stop), onPressed: notifier.stop),
             IconButton(iconSize: 36, icon: const Icon(Icons.play_arrow), onPressed: notifier.start),
           ],
-        ),
-      TimerStatus.finished => IconButton(
-          iconSize: 36,
-          icon: const Icon(Icons.refresh),
-          onPressed: notifier.stop,
         ),
     };
   }

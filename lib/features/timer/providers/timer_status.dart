@@ -1,1 +1,1 @@
-enum TimerStatus { idle, running, paused, finished }
+enum TimerStatus { idle, countingIn, running, paused }

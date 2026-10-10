@@ -25,7 +25,7 @@ final historySessionStoreProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef HistorySessionStoreRef = AutoDisposeProviderRef<HistorySessionStore>;
-String _$historyNotifierHash() => r'36df033a010b25c83c70b13053dd00712a7b5b1d';
+String _$historyNotifierHash() => r'5eaa0d8451a076bb36d11c64fdf93489b6191cfb';
 
 /// See also [HistoryNotifier].
 @ProviderFor(HistoryNotifier)

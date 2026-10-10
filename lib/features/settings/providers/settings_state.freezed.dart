@@ -21,7 +21,7 @@ mixin _$SettingsState {
   DialTheme get dialTheme => throw _privateConstructorUsedError;
   VoiceAnnounceInterval get voiceAnnounceInterval =>
       throw _privateConstructorUsedError;
-  int get countdownFromSeconds => throw _privateConstructorUsedError;
+  int get countInSeconds => throw _privateConstructorUsedError;
 
   /// Create a copy of SettingsState
   /// with the given fields replaced by the non-null parameter values.
@@ -41,7 +41,7 @@ abstract class $SettingsStateCopyWith<$Res> {
     ThemeMode themeMode,
     DialTheme dialTheme,
     VoiceAnnounceInterval voiceAnnounceInterval,
-    int countdownFromSeconds,
+    int countInSeconds,
   });
 }
 
@@ -63,7 +63,7 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
     Object? themeMode = null,
     Object? dialTheme = null,
     Object? voiceAnnounceInterval = null,
-    Object? countdownFromSeconds = null,
+    Object? countInSeconds = null,
   }) {
     return _then(
       _value.copyWith(
@@ -79,9 +79,9 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
                 ? _value.voiceAnnounceInterval
                 : voiceAnnounceInterval // ignore: cast_nullable_to_non_nullable
                       as VoiceAnnounceInterval,
-            countdownFromSeconds: null == countdownFromSeconds
-                ? _value.countdownFromSeconds
-                : countdownFromSeconds // ignore: cast_nullable_to_non_nullable
+            countInSeconds: null == countInSeconds
+                ? _value.countInSeconds
+                : countInSeconds // ignore: cast_nullable_to_non_nullable
                       as int,
           )
           as $Val,
@@ -102,7 +102,7 @@ abstract class _$$SettingsStateImplCopyWith<$Res>
     ThemeMode themeMode,
     DialTheme dialTheme,
     VoiceAnnounceInterval voiceAnnounceInterval,
-    int countdownFromSeconds,
+    int countInSeconds,
   });
 }
 
@@ -123,7 +123,7 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
     Object? themeMode = null,
     Object? dialTheme = null,
     Object? voiceAnnounceInterval = null,
-    Object? countdownFromSeconds = null,
+    Object? countInSeconds = null,
   }) {
     return _then(
       _$SettingsStateImpl(
@@ -139,9 +139,9 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
             ? _value.voiceAnnounceInterval
             : voiceAnnounceInterval // ignore: cast_nullable_to_non_nullable
                   as VoiceAnnounceInterval,
-        countdownFromSeconds: null == countdownFromSeconds
-            ? _value.countdownFromSeconds
-            : countdownFromSeconds // ignore: cast_nullable_to_non_nullable
+        countInSeconds: null == countInSeconds
+            ? _value.countInSeconds
+            : countInSeconds // ignore: cast_nullable_to_non_nullable
                   as int,
       ),
     );
@@ -155,7 +155,7 @@ class _$SettingsStateImpl implements _SettingsState {
     required this.themeMode,
     required this.dialTheme,
     required this.voiceAnnounceInterval,
-    required this.countdownFromSeconds,
+    required this.countInSeconds,
   });
 
   @override
@@ -165,11 +165,11 @@ class _$SettingsStateImpl implements _SettingsState {
   @override
   final VoiceAnnounceInterval voiceAnnounceInterval;
   @override
-  final int countdownFromSeconds;
+  final int countInSeconds;
 
   @override
   String toString() {
-    return 'SettingsState(themeMode: $themeMode, dialTheme: $dialTheme, voiceAnnounceInterval: $voiceAnnounceInterval, countdownFromSeconds: $countdownFromSeconds)';
+    return 'SettingsState(themeMode: $themeMode, dialTheme: $dialTheme, voiceAnnounceInterval: $voiceAnnounceInterval, countInSeconds: $countInSeconds)';
   }
 
   @override
@@ -183,8 +183,8 @@ class _$SettingsStateImpl implements _SettingsState {
                 other.dialTheme == dialTheme) &&
             (identical(other.voiceAnnounceInterval, voiceAnnounceInterval) ||
                 other.voiceAnnounceInterval == voiceAnnounceInterval) &&
-            (identical(other.countdownFromSeconds, countdownFromSeconds) ||
-                other.countdownFromSeconds == countdownFromSeconds));
+            (identical(other.countInSeconds, countInSeconds) ||
+                other.countInSeconds == countInSeconds));
   }
 
   @override
@@ -193,7 +193,7 @@ class _$SettingsStateImpl implements _SettingsState {
     themeMode,
     dialTheme,
     voiceAnnounceInterval,
-    countdownFromSeconds,
+    countInSeconds,
   );
 
   /// Create a copy of SettingsState
@@ -210,7 +210,7 @@ abstract class _SettingsState implements SettingsState {
     required final ThemeMode themeMode,
     required final DialTheme dialTheme,
     required final VoiceAnnounceInterval voiceAnnounceInterval,
-    required final int countdownFromSeconds,
+    required final int countInSeconds,
   }) = _$SettingsStateImpl;
 
   @override
@@ -220,7 +220,7 @@ abstract class _SettingsState implements SettingsState {
   @override
   VoiceAnnounceInterval get voiceAnnounceInterval;
   @override
-  int get countdownFromSeconds;
+  int get countInSeconds;
 
   /// Create a copy of SettingsState
   /// with the given fields replaced by the non-null parameter values.

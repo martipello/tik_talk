@@ -18,7 +18,6 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$TimerSession {
   int? get id => throw _privateConstructorUsedError;
-  TimerMode get mode => throw _privateConstructorUsedError;
   DateTime get completedAt => throw _privateConstructorUsedError;
   Duration get duration => throw _privateConstructorUsedError;
   List<Duration> get laps => throw _privateConstructorUsedError;
@@ -39,7 +38,6 @@ abstract class $TimerSessionCopyWith<$Res> {
   @useResult
   $Res call({
     int? id,
-    TimerMode mode,
     DateTime completedAt,
     Duration duration,
     List<Duration> laps,
@@ -62,7 +60,6 @@ class _$TimerSessionCopyWithImpl<$Res, $Val extends TimerSession>
   @override
   $Res call({
     Object? id = freezed,
-    Object? mode = null,
     Object? completedAt = null,
     Object? duration = null,
     Object? laps = null,
@@ -73,10 +70,6 @@ class _$TimerSessionCopyWithImpl<$Res, $Val extends TimerSession>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as int?,
-            mode: null == mode
-                ? _value.mode
-                : mode // ignore: cast_nullable_to_non_nullable
-                      as TimerMode,
             completedAt: null == completedAt
                 ? _value.completedAt
                 : completedAt // ignore: cast_nullable_to_non_nullable
@@ -106,7 +99,6 @@ abstract class _$$TimerSessionImplCopyWith<$Res>
   @useResult
   $Res call({
     int? id,
-    TimerMode mode,
     DateTime completedAt,
     Duration duration,
     List<Duration> laps,
@@ -128,7 +120,6 @@ class __$$TimerSessionImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = freezed,
-    Object? mode = null,
     Object? completedAt = null,
     Object? duration = null,
     Object? laps = null,
@@ -139,10 +130,6 @@ class __$$TimerSessionImplCopyWithImpl<$Res>
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
                   as int?,
-        mode: null == mode
-            ? _value.mode
-            : mode // ignore: cast_nullable_to_non_nullable
-                  as TimerMode,
         completedAt: null == completedAt
             ? _value.completedAt
             : completedAt // ignore: cast_nullable_to_non_nullable
@@ -165,7 +152,6 @@ class __$$TimerSessionImplCopyWithImpl<$Res>
 class _$TimerSessionImpl implements _TimerSession {
   const _$TimerSessionImpl({
     required this.id,
-    required this.mode,
     required this.completedAt,
     required this.duration,
     required final List<Duration> laps,
@@ -173,8 +159,6 @@ class _$TimerSessionImpl implements _TimerSession {
 
   @override
   final int? id;
-  @override
-  final TimerMode mode;
   @override
   final DateTime completedAt;
   @override
@@ -189,7 +173,7 @@ class _$TimerSessionImpl implements _TimerSession {
 
   @override
   String toString() {
-    return 'TimerSession(id: $id, mode: $mode, completedAt: $completedAt, duration: $duration, laps: $laps)';
+    return 'TimerSession(id: $id, completedAt: $completedAt, duration: $duration, laps: $laps)';
   }
 
   @override
@@ -198,7 +182,6 @@ class _$TimerSessionImpl implements _TimerSession {
         (other.runtimeType == runtimeType &&
             other is _$TimerSessionImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.mode, mode) || other.mode == mode) &&
             (identical(other.completedAt, completedAt) ||
                 other.completedAt == completedAt) &&
             (identical(other.duration, duration) ||
@@ -210,7 +193,6 @@ class _$TimerSessionImpl implements _TimerSession {
   int get hashCode => Object.hash(
     runtimeType,
     id,
-    mode,
     completedAt,
     duration,
     const DeepCollectionEquality().hash(_laps),
@@ -228,7 +210,6 @@ class _$TimerSessionImpl implements _TimerSession {
 abstract class _TimerSession implements TimerSession {
   const factory _TimerSession({
     required final int? id,
-    required final TimerMode mode,
     required final DateTime completedAt,
     required final Duration duration,
     required final List<Duration> laps,
@@ -236,8 +217,6 @@ abstract class _TimerSession implements TimerSession {
 
   @override
   int? get id;
-  @override
-  TimerMode get mode;
   @override
   DateTime get completedAt;
   @override
