@@ -13,7 +13,8 @@ import '../../providers/timer_status.dart';
 // always harmonizes with whatever theme is picked, rather than a fixed hue
 // that can clash with the chosen accent (e.g. a fixed green against a blue
 // theme).
-Color _glowColorFor(Color accentColor) => Color.lerp(accentColor, Colors.white, 0.45)!;
+Color _glowColorFor(Color accentColor) =>
+    HSLColor.fromColor(accentColor).withSaturation(1).withLightness(0.62).toColor();
 
 class WatchFace extends StatelessWidget {
   const WatchFace({
@@ -68,7 +69,7 @@ class _ClassicStopwatchFace extends StatelessWidget {
   final Color accentColor;
   final bool isGlowing;
 
-  static const _digitalReadoutOffsetFraction = 0.46;
+  static const _digitalReadoutOffsetFraction = 0.36;
 
   @override
   Widget build(BuildContext context) {
@@ -295,7 +296,7 @@ class _StopwatchFacePainter extends CustomPainter {
       canvas.drawCircle(
         center,
         faceRadius,
-        Paint()..color = _glowColorFor(accentColor).withValues(alpha: 0.22),
+        Paint()..color = _glowColorFor(accentColor).withValues(alpha: 0.32),
       );
     }
 

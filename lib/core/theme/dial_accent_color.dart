@@ -11,7 +11,7 @@ enum DialAccentColor {
   Color get value => switch (this) {
         DialAccentColor.red => Colors.red,
         DialAccentColor.blue => Colors.blue,
-        DialAccentColor.green => Colors.green,
+        DialAccentColor.green => Colors.lightGreen,
         DialAccentColor.orange => Colors.orange,
         DialAccentColor.black => Colors.black,
         DialAccentColor.white => Colors.white,

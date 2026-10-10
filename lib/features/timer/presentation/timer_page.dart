@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:split_button/split_button.dart';
 
-import '../../../core/extensions/duration_extension.dart';
 import '../../../core/widgets/view_constraint.dart';
 import '../../settings/providers/settings_notifier.dart';
 import '../providers/timer_notifier.dart';
 import '../providers/timer_state.dart';
 import '../providers/timer_status.dart';
+import 'widgets/lap_board.dart';
 import 'widgets/watch_face.dart';
 
 class TimerPage extends ConsumerStatefulWidget {
@@ -28,65 +28,47 @@ class _TimerPageState extends ConsumerState<TimerPage> {
     final settings = ref.watch(settingsNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('TikTalk'),
-        actions: [
-          IconButton(
-            icon: Icon(_isGlowing ? Icons.lightbulb : Icons.lightbulb_outline),
-            tooltip: 'Backlight',
-            onPressed: _toggleGlow,
+      appBar: AppBar(title: const Text('TikTalk')),
+      body: Stack(
+        children: [
+          SafeArea(
+            child: ViewConstraint(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: WatchFace(
+                          timerState: timerState,
+                          dialFaceStyle: settings.dialFaceStyle,
+                          accentColor: settings.dialAccentColor.value,
+                          isGlowing: _isGlowing,
+                        ),
+                      ),
+                    ),
+                  ),
+                  LapBoard(laps: timerState.laps, accentColor: settings.dialAccentColor.value),
+                  _Controls(timerState: timerState),
+                ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: 16,
+            right: 16,
+            child: FloatingActionButton.small(
+              tooltip: 'Backlight',
+              onPressed: _toggleGlow,
+              child: Icon(_isGlowing ? Icons.lightbulb : Icons.lightbulb_outline),
+            ),
           ),
         ],
       ),
-      body: SafeArea(
-        child: ViewConstraint(
-          child: Column(
-            children: [
-              Expanded(
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: WatchFace(
-                      timerState: timerState,
-                      dialFaceStyle: settings.dialFaceStyle,
-                      accentColor: settings.dialAccentColor.value,
-                      isGlowing: _isGlowing,
-                    ),
-                  ),
-                ),
-              ),
-              _LapList(laps: timerState.laps),
-              _Controls(timerState: timerState),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
 
-class _LapList extends StatelessWidget {
-  const _LapList({required this.laps});
-
-  final List<Duration> laps;
-
-  @override
-  Widget build(BuildContext context) {
-    if (laps.isEmpty) return const SizedBox.shrink();
-
-    return SizedBox(
-      height: 120,
-      child: ListView.builder(
-        itemCount: laps.length,
-        itemBuilder: (context, index) => ListTile(
-          dense: true,
-          leading: Text('Lap ${index + 1}'),
-          title: Text(laps[index].formattedClock),
-        ),
-      ),
-    );
-  }
-}
 
 class _Controls extends ConsumerWidget {
   const _Controls({required this.timerState});
