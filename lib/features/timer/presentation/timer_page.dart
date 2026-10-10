@@ -134,14 +134,17 @@ class _StartSplitButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final buttonTextStyle = Theme.of(
+      context,
+    ).textTheme.labelLarge?.copyWith(color: colorScheme.onPrimary);
 
     return SplitButton<int>(
       width: width,
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
       onPressed: onStart,
-      title: const Text('Start'),
-      action: Text('+$countInSeconds'),
+      title: Text('Start', style: buttonTextStyle),
+      action: Text('+$countInSeconds', style: buttonTextStyle),
       onChanged: onCountInChanged,
       popupList: _countInOptions
           .map(
