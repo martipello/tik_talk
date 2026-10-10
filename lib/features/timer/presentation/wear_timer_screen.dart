@@ -20,8 +20,8 @@ class WearTimerScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                timerState.status == TimerStatus.countingIn
-                    ? timerState.countInSecondsRemaining.toString()
+                timerState.status == TimerStatus.countingDown
+                    ? timerState.countdownSecondsRemaining.toString()
                     : timerState.elapsed.formattedClock,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
@@ -50,7 +50,7 @@ class _WearControls extends ConsumerWidget {
           icon: const Icon(Icons.play_arrow),
           onPressed: notifier.start,
         ),
-      TimerStatus.countingIn => IconButton(
+      TimerStatus.countingDown => IconButton(
           iconSize: 36,
           icon: const Icon(Icons.close),
           onPressed: notifier.stop,

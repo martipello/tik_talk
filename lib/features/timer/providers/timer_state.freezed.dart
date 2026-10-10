@@ -20,7 +20,8 @@ mixin _$TimerState {
   TimerStatus get status => throw _privateConstructorUsedError;
   Duration get elapsed => throw _privateConstructorUsedError;
   List<Duration> get laps => throw _privateConstructorUsedError;
-  int get countInSecondsRemaining => throw _privateConstructorUsedError;
+  int get countdownSecondsRemaining => throw _privateConstructorUsedError;
+  double get countdownDialValue => throw _privateConstructorUsedError;
 
   /// Create a copy of TimerState
   /// with the given fields replaced by the non-null parameter values.
@@ -40,7 +41,8 @@ abstract class $TimerStateCopyWith<$Res> {
     TimerStatus status,
     Duration elapsed,
     List<Duration> laps,
-    int countInSecondsRemaining,
+    int countdownSecondsRemaining,
+    double countdownDialValue,
   });
 }
 
@@ -62,7 +64,8 @@ class _$TimerStateCopyWithImpl<$Res, $Val extends TimerState>
     Object? status = null,
     Object? elapsed = null,
     Object? laps = null,
-    Object? countInSecondsRemaining = null,
+    Object? countdownSecondsRemaining = null,
+    Object? countdownDialValue = null,
   }) {
     return _then(
       _value.copyWith(
@@ -78,10 +81,14 @@ class _$TimerStateCopyWithImpl<$Res, $Val extends TimerState>
                 ? _value.laps
                 : laps // ignore: cast_nullable_to_non_nullable
                       as List<Duration>,
-            countInSecondsRemaining: null == countInSecondsRemaining
-                ? _value.countInSecondsRemaining
-                : countInSecondsRemaining // ignore: cast_nullable_to_non_nullable
+            countdownSecondsRemaining: null == countdownSecondsRemaining
+                ? _value.countdownSecondsRemaining
+                : countdownSecondsRemaining // ignore: cast_nullable_to_non_nullable
                       as int,
+            countdownDialValue: null == countdownDialValue
+                ? _value.countdownDialValue
+                : countdownDialValue // ignore: cast_nullable_to_non_nullable
+                      as double,
           )
           as $Val,
     );
@@ -101,7 +108,8 @@ abstract class _$$TimerStateImplCopyWith<$Res>
     TimerStatus status,
     Duration elapsed,
     List<Duration> laps,
-    int countInSecondsRemaining,
+    int countdownSecondsRemaining,
+    double countdownDialValue,
   });
 }
 
@@ -122,7 +130,8 @@ class __$$TimerStateImplCopyWithImpl<$Res>
     Object? status = null,
     Object? elapsed = null,
     Object? laps = null,
-    Object? countInSecondsRemaining = null,
+    Object? countdownSecondsRemaining = null,
+    Object? countdownDialValue = null,
   }) {
     return _then(
       _$TimerStateImpl(
@@ -138,10 +147,14 @@ class __$$TimerStateImplCopyWithImpl<$Res>
             ? _value._laps
             : laps // ignore: cast_nullable_to_non_nullable
                   as List<Duration>,
-        countInSecondsRemaining: null == countInSecondsRemaining
-            ? _value.countInSecondsRemaining
-            : countInSecondsRemaining // ignore: cast_nullable_to_non_nullable
+        countdownSecondsRemaining: null == countdownSecondsRemaining
+            ? _value.countdownSecondsRemaining
+            : countdownSecondsRemaining // ignore: cast_nullable_to_non_nullable
                   as int,
+        countdownDialValue: null == countdownDialValue
+            ? _value.countdownDialValue
+            : countdownDialValue // ignore: cast_nullable_to_non_nullable
+                  as double,
       ),
     );
   }
@@ -154,7 +167,8 @@ class _$TimerStateImpl implements _TimerState {
     required this.status,
     required this.elapsed,
     required final List<Duration> laps,
-    required this.countInSecondsRemaining,
+    required this.countdownSecondsRemaining,
+    required this.countdownDialValue,
   }) : _laps = laps;
 
   @override
@@ -170,11 +184,13 @@ class _$TimerStateImpl implements _TimerState {
   }
 
   @override
-  final int countInSecondsRemaining;
+  final int countdownSecondsRemaining;
+  @override
+  final double countdownDialValue;
 
   @override
   String toString() {
-    return 'TimerState(status: $status, elapsed: $elapsed, laps: $laps, countInSecondsRemaining: $countInSecondsRemaining)';
+    return 'TimerState(status: $status, elapsed: $elapsed, laps: $laps, countdownSecondsRemaining: $countdownSecondsRemaining, countdownDialValue: $countdownDialValue)';
   }
 
   @override
@@ -186,10 +202,12 @@ class _$TimerStateImpl implements _TimerState {
             (identical(other.elapsed, elapsed) || other.elapsed == elapsed) &&
             const DeepCollectionEquality().equals(other._laps, _laps) &&
             (identical(
-                  other.countInSecondsRemaining,
-                  countInSecondsRemaining,
+                  other.countdownSecondsRemaining,
+                  countdownSecondsRemaining,
                 ) ||
-                other.countInSecondsRemaining == countInSecondsRemaining));
+                other.countdownSecondsRemaining == countdownSecondsRemaining) &&
+            (identical(other.countdownDialValue, countdownDialValue) ||
+                other.countdownDialValue == countdownDialValue));
   }
 
   @override
@@ -198,7 +216,8 @@ class _$TimerStateImpl implements _TimerState {
     status,
     elapsed,
     const DeepCollectionEquality().hash(_laps),
-    countInSecondsRemaining,
+    countdownSecondsRemaining,
+    countdownDialValue,
   );
 
   /// Create a copy of TimerState
@@ -215,7 +234,8 @@ abstract class _TimerState implements TimerState {
     required final TimerStatus status,
     required final Duration elapsed,
     required final List<Duration> laps,
-    required final int countInSecondsRemaining,
+    required final int countdownSecondsRemaining,
+    required final double countdownDialValue,
   }) = _$TimerStateImpl;
 
   @override
@@ -225,7 +245,9 @@ abstract class _TimerState implements TimerState {
   @override
   List<Duration> get laps;
   @override
-  int get countInSecondsRemaining;
+  int get countdownSecondsRemaining;
+  @override
+  double get countdownDialValue;
 
   /// Create a copy of TimerState
   /// with the given fields replaced by the non-null parameter values.

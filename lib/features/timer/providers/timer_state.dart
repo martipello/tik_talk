@@ -10,13 +10,15 @@ class TimerState with _$TimerState {
     required TimerStatus status,
     required Duration elapsed,
     required List<Duration> laps,
-    required int countInSecondsRemaining,
+    required int countdownSecondsRemaining,
+    required double countdownDialValue,
   }) = _TimerState;
 
   factory TimerState.initial() => const TimerState(
         status: TimerStatus.idle,
         elapsed: Duration.zero,
         laps: [],
-        countInSecondsRemaining: 0,
+        countdownSecondsRemaining: 0,
+        countdownDialValue: 0,
       );
 }

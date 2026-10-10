@@ -13,14 +13,14 @@ class SettingsRepository {
   static const _themeModeKey = 'theme_mode';
   static const _dialThemeKey = 'dial_theme';
   static const _voiceAnnounceIntervalKey = 'voice_announce_interval';
-  static const _countInSecondsKey = 'count_in_seconds';
+  static const _countdownSecondsKey = 'countdown_seconds';
 
   SettingsState load() {
     final initial = SettingsState.initial();
     final themeModeName = _preferences.getString(_themeModeKey);
     final dialThemeName = _preferences.getString(_dialThemeKey);
     final voiceIntervalName = _preferences.getString(_voiceAnnounceIntervalKey);
-    final countInSeconds = _preferences.getInt(_countInSecondsKey);
+    final countdownSeconds = _preferences.getInt(_countdownSecondsKey);
 
     return initial.copyWith(
       themeMode: ThemeMode.values.firstWhere(
@@ -35,7 +35,7 @@ class SettingsRepository {
         (value) => value.name == voiceIntervalName,
         orElse: () => initial.voiceAnnounceInterval,
       ),
-      countInSeconds: countInSeconds ?? initial.countInSeconds,
+      countdownSeconds: countdownSeconds ?? initial.countdownSeconds,
     );
   }
 
@@ -43,6 +43,6 @@ class SettingsRepository {
     await _preferences.setString(_themeModeKey, state.themeMode.name);
     await _preferences.setString(_dialThemeKey, state.dialTheme.name);
     await _preferences.setString(_voiceAnnounceIntervalKey, state.voiceAnnounceInterval.name);
-    await _preferences.setInt(_countInSecondsKey, state.countInSeconds);
+    await _preferences.setInt(_countdownSecondsKey, state.countdownSeconds);
   }
 }

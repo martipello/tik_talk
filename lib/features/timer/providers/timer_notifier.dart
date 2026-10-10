@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/services/service_providers.dart';
+import '../../history/data/timer_session.dart';
 import '../../history/providers/history_notifier.dart';
 import '../../settings/providers/settings_notifier.dart';
 import 'timer_state.dart';
@@ -13,14 +14,14 @@ part 'timer_notifier.g.dart';
 @riverpod
 class TimerNotifier extends _$TimerNotifier {
   Timer? _ticker;
-  Timer? _countInTicker;
+  Timer? _countdownTicker;
   Duration _lastAnnounced = Duration.zero;
 
   @override
   TimerState build() {
     ref.onDispose(() {
       _ticker?.cancel();
-      _countInTicker?.cancel();
+      _countdownTicker?.cancel();
     });
     return TimerState.initial();
   }
@@ -29,9 +30,9 @@ class TimerNotifier extends _$TimerNotifier {
     if (state.status == TimerStatus.running) return;
 
     if (state.status == TimerStatus.idle) {
-      final countInSeconds = ref.read(settingsNotifierProvider).countInSeconds;
-      if (countInSeconds > 0) {
-        _beginCountIn(countInSeconds);
+      final countdownSeconds = ref.read(settingsNotifierProvider).countdownSeconds;
+      if (countdownSeconds > 0) {
+        _beginCountdown(countdownSeconds);
         return;
       }
     }
@@ -52,7 +53,7 @@ class TimerNotifier extends _$TimerNotifier {
 
   Future<void> stop() async {
     _ticker?.cancel();
-    _countInTicker?.cancel();
+    _countdownTicker?.cancel();
     if (state.elapsed > Duration.zero) {
       await ref
           .read(historyNotifierProvider.notifier)
@@ -61,28 +62,46 @@ class TimerNotifier extends _$TimerNotifier {
     state = TimerState.initial();
   }
 
-  void _beginCountIn(int countInSeconds) {
-    state = state.copyWith(status: TimerStatus.countingIn, countInSecondsRemaining: countInSeconds);
-    unawaited(ref.read(ttsServiceProvider).speak('$countInSeconds'));
-    _countInTicker?.cancel();
-    _countInTicker = Timer.periodic(const Duration(seconds: 1), (_) => _countInTick());
+  void resumeSession(TimerSession session) {
+    _ticker?.cancel();
+    _countdownTicker?.cancel();
+    state = TimerState.initial().copyWith(
+      status: TimerStatus.paused,
+      elapsed: session.duration,
+      laps: session.laps,
+    );
   }
 
-  void _countInTick() {
-    final remaining = state.countInSecondsRemaining - 1;
+  void _beginCountdown(int countdownSeconds) {
+    final startDialValue = (state.elapsed.inMilliseconds % 1000) / 1000.0;
+    state = state.copyWith(
+      status: TimerStatus.countingDown,
+      countdownSecondsRemaining: countdownSeconds,
+      countdownDialValue: startDialValue,
+    );
+    unawaited(ref.read(ttsServiceProvider).speak('$countdownSeconds'));
+    _countdownTicker?.cancel();
+    _countdownTicker = Timer.periodic(const Duration(seconds: 1), (_) => _countdownTick());
+  }
+
+  void _countdownTick() {
+    final remaining = state.countdownSecondsRemaining - 1;
     if (remaining <= 0) {
-      _countInTicker?.cancel();
+      _countdownTicker?.cancel();
       unawaited(ref.read(ttsServiceProvider).speak('Go'));
       _beginRunning();
       return;
     }
 
-    state = state.copyWith(countInSecondsRemaining: remaining);
+    state = state.copyWith(
+      countdownSecondsRemaining: remaining,
+      countdownDialValue: state.countdownDialValue - 1,
+    );
     unawaited(ref.read(ttsServiceProvider).speak('$remaining'));
   }
 
   void _beginRunning() {
-    state = state.copyWith(status: TimerStatus.running, countInSecondsRemaining: 0);
+    state = state.copyWith(status: TimerStatus.running, countdownSecondsRemaining: 0);
     _lastAnnounced = state.elapsed;
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(milliseconds: 100), (_) => _tick());

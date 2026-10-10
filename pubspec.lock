@@ -608,6 +608,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.6.4"
+  segment_display:
+    dependency: "direct main"
+    description:
+      name: segment_display
+      sha256: f4b0939e09c18d61e361a049453eccd15b4e53d9036d1fc3ff20d3615a4b81f9
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.0"
   shared_preferences:
     dependency: "direct main"
     description:

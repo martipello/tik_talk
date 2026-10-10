@@ -12,13 +12,13 @@ class SettingsState with _$SettingsState {
     required ThemeMode themeMode,
     required DialTheme dialTheme,
     required VoiceAnnounceInterval voiceAnnounceInterval,
-    required int countInSeconds,
+    required int countdownSeconds,
   }) = _SettingsState;
 
   factory SettingsState.initial() => const SettingsState(
         themeMode: ThemeMode.system,
         dialTheme: DialTheme.classicStopwatch,
         voiceAnnounceInterval: VoiceAnnounceInterval.everyMinute,
-        countInSeconds: 0,
+        countdownSeconds: 0,
       );
 }

@@ -31,8 +31,8 @@ class SettingsNotifier extends _$SettingsNotifier {
     await _repository.save(state);
   }
 
-  Future<void> updateCountInSeconds(int seconds) async {
-    state = state.copyWith(countInSeconds: seconds);
+  Future<void> updateCountdownSeconds(int seconds) async {
+    state = state.copyWith(countdownSeconds: seconds);
     await _repository.save(state);
   }
 }

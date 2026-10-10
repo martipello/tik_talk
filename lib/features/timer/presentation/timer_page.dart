@@ -74,16 +74,17 @@ class _Controls extends ConsumerWidget {
       child: LayoutBuilder(
         builder: (context, constraints) {
           if (timerState.status == TimerStatus.idle) {
-            final countInSeconds = ref.watch(settingsNotifierProvider).countInSeconds;
+            final countdownSeconds = ref.watch(settingsNotifierProvider).countdownSeconds;
             return _StartSplitButton(
               width: constraints.maxWidth,
-              countInSeconds: countInSeconds,
+              countdownSeconds: countdownSeconds,
               onStart: notifier.start,
-              onCountInChanged: ref.read(settingsNotifierProvider.notifier).updateCountInSeconds,
+              onCountdownSecondsChanged:
+                  ref.read(settingsNotifierProvider.notifier).updateCountdownSeconds,
             );
           }
 
-          if (timerState.status == TimerStatus.countingIn) {
+          if (timerState.status == TimerStatus.countingDown) {
             return SizedBox(
               width: constraints.maxWidth,
               child: _SecondaryButton(label: 'Cancel', onPressed: notifier.stop),
@@ -119,17 +120,17 @@ class _Controls extends ConsumerWidget {
 class _StartSplitButton extends StatelessWidget {
   const _StartSplitButton({
     required this.width,
-    required this.countInSeconds,
+    required this.countdownSeconds,
     required this.onStart,
-    required this.onCountInChanged,
+    required this.onCountdownSecondsChanged,
   });
 
-  static const _countInOptions = [0, 10, 20, 30];
+  static const _countdownOptions = [0, 3, 5, 10, 20, 30];
 
   final double width;
-  final int countInSeconds;
+  final int countdownSeconds;
   final VoidCallback onStart;
-  final ValueChanged<int> onCountInChanged;
+  final ValueChanged<int> onCountdownSecondsChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -140,19 +141,20 @@ class _StartSplitButton extends StatelessWidget {
 
     return SplitButton<int>(
       width: width,
+      elevation: 1,
       backgroundColor: colorScheme.primary,
       foregroundColor: colorScheme.onPrimary,
       onPressed: onStart,
       title: Text('Start', style: buttonTextStyle),
-      action: Text('+$countInSeconds', style: buttonTextStyle),
-      onChanged: onCountInChanged,
-      popupList: _countInOptions
+      action: Text('+$countdownSeconds', style: buttonTextStyle),
+      onChanged: onCountdownSecondsChanged,
+      popupList: _countdownOptions
           .map(
             (seconds) => SplitButtonEntry(
               value: seconds,
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                child: Text(seconds == 0 ? 'No count-in' : '${seconds}s count-in'),
+                child: Text(seconds == 0 ? 'No countdown' : '${seconds}s countdown'),
               ),
             ),
           )

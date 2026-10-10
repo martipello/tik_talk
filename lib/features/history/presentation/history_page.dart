@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/extensions/date_time_extension.dart';
 import '../../../core/extensions/duration_extension.dart';
 import '../../../core/widgets/view_constraint.dart';
+import '../../timer/providers/timer_notifier.dart';
 import '../data/timer_session.dart';
 import '../providers/history_notifier.dart';
 
@@ -39,6 +41,16 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
     _clearSelection();
   }
 
+  Future<void> _resumeSession(TimerSession session) async {
+    final id = session.id;
+    ref.read(timerNotifierProvider.notifier).resumeSession(session);
+    if (id != null) {
+      await ref.read(historyNotifierProvider.notifier).deleteSession(id);
+    }
+    if (!mounted) return;
+    context.go('/timer');
+  }
+
   @override
   Widget build(BuildContext context) {
     final sessionsAsync = ref.watch(historyNotifierProvider);
@@ -58,15 +70,20 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
           data: (sessions) => sessions.isEmpty
               ? const Center(child: Text('No sessions yet'))
               : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   itemCount: sessions.length,
                   itemBuilder: (context, index) {
                     final session = sessions[index];
                     final id = session.id;
 
-                    return _HistoryTile(
+                    return _HistoryCard(
                       session: session,
                       isSelected: id != null && _selectedIds.contains(id),
-                      onTap: id == null || !_isSelecting ? null : () => _toggleSelection(id),
+                      onTap: id == null
+                          ? null
+                          : _isSelecting
+                              ? () => _toggleSelection(id)
+                              : () => _resumeSession(session),
                       onLongPress: id == null ? null : () => _toggleSelection(id),
                     );
                   },
@@ -79,8 +96,8 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
   }
 }
 
-class _HistoryTile extends StatelessWidget {
-  const _HistoryTile({
+class _HistoryCard extends StatelessWidget {
+  const _HistoryCard({
     required this.session,
     required this.isSelected,
     required this.onTap,
@@ -94,14 +111,17 @@ class _HistoryTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      selected: isSelected,
-      onTap: onTap,
-      onLongPress: onLongPress,
-      leading: Icon(isSelected ? Icons.check_circle : Icons.timer_outlined),
-      title: Text(session.duration.formattedClock),
-      subtitle: Text(session.completedAt.formattedHistoryTimestamp),
-      trailing: session.laps.isEmpty ? null : Text('${session.laps.length} laps'),
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      color: isSelected ? Theme.of(context).colorScheme.primaryContainer : null,
+      child: ListTile(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        leading: Icon(isSelected ? Icons.check_circle : Icons.timer_outlined),
+        title: Text(session.duration.formattedClock),
+        subtitle: Text(session.completedAt.formattedHistoryTimestamp),
+        trailing: session.laps.isEmpty ? null : Text('${session.laps.length} laps'),
+      ),
     );
   }
 }
