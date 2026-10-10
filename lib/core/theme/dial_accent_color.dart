@@ -9,12 +9,12 @@ enum DialAccentColor {
   white;
 
   Color get value => switch (this) {
-        DialAccentColor.red => const Color(0xFFD7342A),
-        DialAccentColor.blue => const Color(0xFF2563EB),
-        DialAccentColor.green => const Color(0xFF2E9E4F),
-        DialAccentColor.orange => const Color(0xFFE2B33C),
-        DialAccentColor.black => const Color(0xFF1A1A1A),
-        DialAccentColor.white => const Color(0xFFF2F2F2),
+        DialAccentColor.red => Colors.red,
+        DialAccentColor.blue => Colors.blue,
+        DialAccentColor.green => Colors.green,
+        DialAccentColor.orange => Colors.orange,
+        DialAccentColor.black => Colors.black,
+        DialAccentColor.white => Colors.white,
       };
 
   String get displayName => switch (this) {
