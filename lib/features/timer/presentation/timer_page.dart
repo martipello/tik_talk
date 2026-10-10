@@ -16,7 +16,7 @@ class TimerPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final timerState = ref.watch(timerNotifierProvider);
-    final dialTheme = ref.watch(settingsNotifierProvider).dialTheme;
+    final settings = ref.watch(settingsNotifierProvider);
 
     return Scaffold(
       appBar: AppBar(title: const Text('TikTalk')),
@@ -25,7 +25,13 @@ class TimerPage extends ConsumerWidget {
           child: Column(
             children: [
               Expanded(
-                child: Center(child: WatchFace(timerState: timerState, dialTheme: dialTheme)),
+                child: Center(
+                  child: WatchFace(
+                    timerState: timerState,
+                    dialFaceStyle: settings.dialFaceStyle,
+                    accentColor: settings.dialAccentColor.value,
+                  ),
+                ),
               ),
               _LapList(laps: timerState.laps),
               _Controls(timerState: timerState),

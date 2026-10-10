@@ -17,8 +17,8 @@ class TikTalkApp extends ConsumerWidget {
       title: 'TikTalk',
       debugShowCheckedModeBanner: false,
       themeMode: settings.themeMode,
-      theme: AppTheme.light(settings.dialTheme),
-      darkTheme: AppTheme.dark(settings.dialTheme),
+      theme: AppTheme.light(settings.dialAccentColor.value),
+      darkTheme: AppTheme.dark(settings.dialAccentColor.value),
       routerConfig: router,
     );
   }

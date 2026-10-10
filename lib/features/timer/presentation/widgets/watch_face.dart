@@ -5,39 +5,46 @@ import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:segment_display/segment_display.dart';
 
 import '../../../../core/extensions/duration_extension.dart';
-import '../../../../core/theme/dial_theme.dart';
+import '../../../../core/theme/dial_face_style.dart';
 import '../../providers/timer_state.dart';
 import '../../providers/timer_status.dart';
 
 class WatchFace extends StatelessWidget {
-  const WatchFace({required this.timerState, required this.dialTheme, super.key});
+  const WatchFace({
+    required this.timerState,
+    required this.dialFaceStyle,
+    required this.accentColor,
+    super.key,
+  });
 
   final TimerState timerState;
-  final DialTheme dialTheme;
+  final DialFaceStyle dialFaceStyle;
+  final Color accentColor;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: 280,
       height: 280,
-      child: switch (dialTheme) {
-        DialTheme.classicStopwatch => _ClassicStopwatchFace(timerState: timerState),
-        DialTheme.liquidGlass => _LiquidGlassFace(timerState: timerState),
+      child: switch (dialFaceStyle) {
+        DialFaceStyle.classicStopwatch =>
+          _ClassicStopwatchFace(timerState: timerState, accentColor: accentColor),
+        DialFaceStyle.fluidGlass => _FluidGlassFace(timerState: timerState, accentColor: accentColor),
       },
     );
   }
 }
 
 class _ClassicStopwatchFace extends StatelessWidget {
-  const _ClassicStopwatchFace({required this.timerState});
+  const _ClassicStopwatchFace({required this.timerState, required this.accentColor});
 
   final TimerState timerState;
+  final Color accentColor;
 
   static const _digitalReadoutOffsetFraction = 0.46;
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = DialTheme.classicStopwatch.accentColor;
     final isCountingDown = timerState.status == TimerStatus.countingDown;
 
     return CustomPaint(
@@ -70,7 +77,7 @@ class _DigitalReadout extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: accentColor.withValues(alpha: 0.08),
+        color: Colors.black.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Padding(
@@ -125,24 +132,34 @@ class _CountdownDigit extends StatelessWidget {
 class _StopwatchFacePainter extends CustomPainter {
   _StopwatchFacePainter({required this.timerState, required this.accentColor});
 
-  static const _subDialRadiusFactor = 0.13;
-  static const _subDialDistanceFactor = 0.58;
-  static const _minutesDialClockAngleDegrees = 45.0;
-  static const _runningDialClockAngleDegrees = 75.0;
+  static const _topMargin = 26.0;
+  static const _sideMargin = 10.0;
+  static const _subDialRadiusFactor = 0.10;
+  static const _subDialDistanceFactor = 0.5;
+  static const _minutesDialClockAngleDegrees = 35.0;
+  static const _runningDialClockAngleDegrees = 85.0;
   static const _outerNotchCount = 48;
+  static const _faceColor = Color(0xFFF7F4EC);
+  static const _caseColor = Color(0xFF2B2B2E);
 
   final TimerState timerState;
   final Color accentColor;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final center = size.center(Offset.zero);
-    final radius = size.shortestSide / 2;
+    final radius = math.min(
+      (size.width - _sideMargin * 2) / 2,
+      (size.height - _topMargin - _sideMargin) / 2,
+    );
+    final center = Offset(size.width / 2, _topMargin + radius);
 
+    _paintCaseBody(canvas, center, radius);
     _paintShadow(canvas, center, radius);
     _paintFaceBackground(canvas, center, radius);
     _paintOuterNotches(canvas, center, radius);
     _paintBezel(canvas, center, radius);
+    _paintCrown(canvas, center, radius);
+    _paintPusher(canvas, center, radius);
 
     _paintDial(canvas, center: center, radius: radius - 18, tickCount: 60, majorEvery: 5);
     _paintHand(
@@ -159,16 +176,16 @@ class _StopwatchFacePainter extends CustomPainter {
 
     final minutesCenter =
         center + _offsetForClockAngle(_minutesDialClockAngleDegrees, subDialDistance);
-    final wholeMinutes = (timerState.elapsed.inMinutes) % 60;
+    final wholeMinutes = timerState.elapsed.inMinutes % 60;
     final minutesAngle = _angleForFraction(wholeMinutes / 60);
     _paintSubDialWell(canvas, minutesCenter, subDialRadius);
     _paintDial(canvas, center: minutesCenter, radius: subDialRadius, tickCount: 12, majorEvery: 3);
     _paintHand(
       canvas,
       center: minutesCenter,
-      length: subDialRadius - 6,
+      length: subDialRadius - 5,
       angle: minutesAngle,
-      strokeWidth: 1.5,
+      strokeWidth: 1.3,
       color: accentColor.withValues(alpha: 0.85),
     );
 
@@ -180,9 +197,9 @@ class _StopwatchFacePainter extends CustomPainter {
     _paintHand(
       canvas,
       center: runningCenter,
-      length: subDialRadius - 6,
+      length: subDialRadius - 5,
       angle: runningAngle,
-      strokeWidth: 1.5,
+      strokeWidth: 1.3,
       color: accentColor.withValues(alpha: 0.85),
     );
 
@@ -203,25 +220,27 @@ class _StopwatchFacePainter extends CustomPainter {
     return Offset(math.sin(radians), -math.cos(radians)) * distance;
   }
 
+  void _paintCaseBody(Canvas canvas, Offset center, double radius) {
+    canvas.drawCircle(center, radius + 6, Paint()..color = _caseColor);
+  }
+
   void _paintShadow(Canvas canvas, Offset center, double radius) {
     final shadowPaint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.25)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
-    canvas.drawCircle(center + const Offset(0, 6), radius - 2, shadowPaint);
+      ..color = Colors.black.withValues(alpha: 0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+    canvas.drawCircle(center + const Offset(0, 5), radius, shadowPaint);
   }
 
   void _paintFaceBackground(Canvas canvas, Offset center, double radius) {
-    final rect = Rect.fromCircle(center: center, radius: radius - 6);
-    final facePaint = Paint()
+    final faceRadius = radius - 6;
+    canvas.drawCircle(center, faceRadius, Paint()..color = _faceColor);
+
+    final vignettePaint = Paint()
       ..shader = RadialGradient(
-        center: const Alignment(-0.3, -0.3),
-        radius: 0.95,
-        colors: [
-          Colors.white,
-          accentColor.withValues(alpha: 0.05),
-        ],
-      ).createShader(rect);
-    canvas.drawCircle(center, radius - 6, facePaint);
+        colors: [_faceColor.withValues(alpha: 0), Colors.black.withValues(alpha: 0.08)],
+        stops: const [0.72, 1.0],
+      ).createShader(Rect.fromCircle(center: center, radius: faceRadius));
+    canvas.drawCircle(center, faceRadius, vignettePaint);
   }
 
   void _paintOuterNotches(Canvas canvas, Offset center, double radius) {
@@ -254,13 +273,61 @@ class _StopwatchFacePainter extends CustomPainter {
     canvas.drawCircle(center, radius - 8, bezelPaint);
   }
 
+  void _paintCrown(Canvas canvas, Offset center, double radius) {
+    final crownWidth = radius * 0.22;
+    final crownHeight = radius * 0.24;
+    final crownRect = Rect.fromCenter(
+      center: center + Offset(0, -radius - crownHeight * 0.3),
+      width: crownWidth,
+      height: crownHeight,
+    );
+    final crownRRect = RRect.fromRectAndRadius(crownRect, Radius.circular(crownWidth * 0.3));
+
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3);
+    canvas.drawRRect(crownRRect.shift(const Offset(0, 1.5)), shadowPaint);
+
+    final metalPaint = Paint()
+      ..shader = const LinearGradient(
+        begin: Alignment.centerLeft,
+        end: Alignment.centerRight,
+        colors: [Color(0xFF8A8D91), Color(0xFFEDEEF0), Color(0xFF8A8D91)],
+      ).createShader(crownRect);
+    canvas.drawRRect(crownRRect, metalPaint);
+
+    final ridgePaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.25)
+      ..strokeWidth = 1;
+    const ridgeCount = 5;
+    for (var i = 1; i < ridgeCount; i++) {
+      final x = crownRect.left + (crownRect.width / ridgeCount) * i;
+      canvas.drawLine(Offset(x, crownRect.top + 2), Offset(x, crownRect.bottom - 2), ridgePaint);
+    }
+  }
+
+  void _paintPusher(Canvas canvas, Offset center, double radius) {
+    final pusherCenter = center + _offsetForClockAngle(-25, radius);
+    final pusherRadius = radius * 0.07;
+    final pusherRect = Rect.fromCircle(center: pusherCenter, radius: pusherRadius);
+
+    final shadowPaint = Paint()
+      ..color = Colors.black.withValues(alpha: 0.3)
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2);
+    canvas.drawCircle(pusherCenter + const Offset(0, 1), pusherRadius, shadowPaint);
+
+    final metalPaint = Paint()
+      ..shader = const RadialGradient(
+        center: Alignment(-0.3, -0.3),
+        colors: [Color(0xFFEDEEF0), Color(0xFF8A8D91)],
+      ).createShader(pusherRect);
+    canvas.drawCircle(pusherCenter, pusherRadius, metalPaint);
+  }
+
   void _paintSubDialWell(Canvas canvas, Offset dialCenter, double radius) {
     final wellPaint = Paint()
       ..shader = RadialGradient(
-        colors: [
-          accentColor.withValues(alpha: 0.12),
-          accentColor.withValues(alpha: 0.02),
-        ],
+        colors: [Colors.black.withValues(alpha: 0.1), Colors.black.withValues(alpha: 0.02)],
       ).createShader(Rect.fromCircle(center: dialCenter, radius: radius));
     canvas.drawCircle(dialCenter, radius, wellPaint);
   }
@@ -273,9 +340,9 @@ class _StopwatchFacePainter extends CustomPainter {
     required int majorEvery,
   }) {
     final ringPaint = Paint()
-      ..color = accentColor.withValues(alpha: 0.4)
+      ..color = accentColor.withValues(alpha: 0.5)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = radius > 60 ? 3 : 1.2;
+      ..strokeWidth = radius > 60 ? 2 : 1.2;
     canvas.drawCircle(center, radius, ringPaint);
 
     for (var i = 0; i < tickCount; i++) {
@@ -287,7 +354,7 @@ class _StopwatchFacePainter extends CustomPainter {
       final outer = center + direction * (radius - tickInset);
       final inner = center + direction * (radius - tickInset - tickLength);
       final tickPaint = Paint()
-        ..color = accentColor.withValues(alpha: 0.6)
+        ..color = Colors.black.withValues(alpha: isMajorTick ? 0.7 : 0.45)
         ..strokeWidth = isMajorTick ? 1.8 : 1;
       canvas.drawLine(inner, outer, tickPaint);
     }
@@ -328,17 +395,17 @@ class _StopwatchFacePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _StopwatchFacePainter oldDelegate) =>
-      oldDelegate.timerState != timerState;
+      oldDelegate.timerState != timerState || oldDelegate.accentColor != accentColor;
 }
 
-class _LiquidGlassFace extends StatelessWidget {
-  const _LiquidGlassFace({required this.timerState});
+class _FluidGlassFace extends StatelessWidget {
+  const _FluidGlassFace({required this.timerState, required this.accentColor});
 
   final TimerState timerState;
+  final Color accentColor;
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = DialTheme.liquidGlass.accentColor;
     final secondsIntoMinute = timerState.elapsed.inMilliseconds % 60000;
     final fillLevel = secondsIntoMinute / 60000;
 

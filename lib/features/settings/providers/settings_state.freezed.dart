@@ -18,7 +18,8 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$SettingsState {
   ThemeMode get themeMode => throw _privateConstructorUsedError;
-  DialTheme get dialTheme => throw _privateConstructorUsedError;
+  DialFaceStyle get dialFaceStyle => throw _privateConstructorUsedError;
+  DialAccentColor get dialAccentColor => throw _privateConstructorUsedError;
   VoiceAnnounceInterval get voiceAnnounceInterval =>
       throw _privateConstructorUsedError;
   int get countdownSeconds => throw _privateConstructorUsedError;
@@ -39,7 +40,8 @@ abstract class $SettingsStateCopyWith<$Res> {
   @useResult
   $Res call({
     ThemeMode themeMode,
-    DialTheme dialTheme,
+    DialFaceStyle dialFaceStyle,
+    DialAccentColor dialAccentColor,
     VoiceAnnounceInterval voiceAnnounceInterval,
     int countdownSeconds,
   });
@@ -61,7 +63,8 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
   @override
   $Res call({
     Object? themeMode = null,
-    Object? dialTheme = null,
+    Object? dialFaceStyle = null,
+    Object? dialAccentColor = null,
     Object? voiceAnnounceInterval = null,
     Object? countdownSeconds = null,
   }) {
@@ -71,10 +74,14 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
                 ? _value.themeMode
                 : themeMode // ignore: cast_nullable_to_non_nullable
                       as ThemeMode,
-            dialTheme: null == dialTheme
-                ? _value.dialTheme
-                : dialTheme // ignore: cast_nullable_to_non_nullable
-                      as DialTheme,
+            dialFaceStyle: null == dialFaceStyle
+                ? _value.dialFaceStyle
+                : dialFaceStyle // ignore: cast_nullable_to_non_nullable
+                      as DialFaceStyle,
+            dialAccentColor: null == dialAccentColor
+                ? _value.dialAccentColor
+                : dialAccentColor // ignore: cast_nullable_to_non_nullable
+                      as DialAccentColor,
             voiceAnnounceInterval: null == voiceAnnounceInterval
                 ? _value.voiceAnnounceInterval
                 : voiceAnnounceInterval // ignore: cast_nullable_to_non_nullable
@@ -100,7 +107,8 @@ abstract class _$$SettingsStateImplCopyWith<$Res>
   @useResult
   $Res call({
     ThemeMode themeMode,
-    DialTheme dialTheme,
+    DialFaceStyle dialFaceStyle,
+    DialAccentColor dialAccentColor,
     VoiceAnnounceInterval voiceAnnounceInterval,
     int countdownSeconds,
   });
@@ -121,7 +129,8 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? themeMode = null,
-    Object? dialTheme = null,
+    Object? dialFaceStyle = null,
+    Object? dialAccentColor = null,
     Object? voiceAnnounceInterval = null,
     Object? countdownSeconds = null,
   }) {
@@ -131,10 +140,14 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
             ? _value.themeMode
             : themeMode // ignore: cast_nullable_to_non_nullable
                   as ThemeMode,
-        dialTheme: null == dialTheme
-            ? _value.dialTheme
-            : dialTheme // ignore: cast_nullable_to_non_nullable
-                  as DialTheme,
+        dialFaceStyle: null == dialFaceStyle
+            ? _value.dialFaceStyle
+            : dialFaceStyle // ignore: cast_nullable_to_non_nullable
+                  as DialFaceStyle,
+        dialAccentColor: null == dialAccentColor
+            ? _value.dialAccentColor
+            : dialAccentColor // ignore: cast_nullable_to_non_nullable
+                  as DialAccentColor,
         voiceAnnounceInterval: null == voiceAnnounceInterval
             ? _value.voiceAnnounceInterval
             : voiceAnnounceInterval // ignore: cast_nullable_to_non_nullable
@@ -153,7 +166,8 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
 class _$SettingsStateImpl implements _SettingsState {
   const _$SettingsStateImpl({
     required this.themeMode,
-    required this.dialTheme,
+    required this.dialFaceStyle,
+    required this.dialAccentColor,
     required this.voiceAnnounceInterval,
     required this.countdownSeconds,
   });
@@ -161,7 +175,9 @@ class _$SettingsStateImpl implements _SettingsState {
   @override
   final ThemeMode themeMode;
   @override
-  final DialTheme dialTheme;
+  final DialFaceStyle dialFaceStyle;
+  @override
+  final DialAccentColor dialAccentColor;
   @override
   final VoiceAnnounceInterval voiceAnnounceInterval;
   @override
@@ -169,7 +185,7 @@ class _$SettingsStateImpl implements _SettingsState {
 
   @override
   String toString() {
-    return 'SettingsState(themeMode: $themeMode, dialTheme: $dialTheme, voiceAnnounceInterval: $voiceAnnounceInterval, countdownSeconds: $countdownSeconds)';
+    return 'SettingsState(themeMode: $themeMode, dialFaceStyle: $dialFaceStyle, dialAccentColor: $dialAccentColor, voiceAnnounceInterval: $voiceAnnounceInterval, countdownSeconds: $countdownSeconds)';
   }
 
   @override
@@ -179,8 +195,10 @@ class _$SettingsStateImpl implements _SettingsState {
             other is _$SettingsStateImpl &&
             (identical(other.themeMode, themeMode) ||
                 other.themeMode == themeMode) &&
-            (identical(other.dialTheme, dialTheme) ||
-                other.dialTheme == dialTheme) &&
+            (identical(other.dialFaceStyle, dialFaceStyle) ||
+                other.dialFaceStyle == dialFaceStyle) &&
+            (identical(other.dialAccentColor, dialAccentColor) ||
+                other.dialAccentColor == dialAccentColor) &&
             (identical(other.voiceAnnounceInterval, voiceAnnounceInterval) ||
                 other.voiceAnnounceInterval == voiceAnnounceInterval) &&
             (identical(other.countdownSeconds, countdownSeconds) ||
@@ -191,7 +209,8 @@ class _$SettingsStateImpl implements _SettingsState {
   int get hashCode => Object.hash(
     runtimeType,
     themeMode,
-    dialTheme,
+    dialFaceStyle,
+    dialAccentColor,
     voiceAnnounceInterval,
     countdownSeconds,
   );
@@ -208,7 +227,8 @@ class _$SettingsStateImpl implements _SettingsState {
 abstract class _SettingsState implements SettingsState {
   const factory _SettingsState({
     required final ThemeMode themeMode,
-    required final DialTheme dialTheme,
+    required final DialFaceStyle dialFaceStyle,
+    required final DialAccentColor dialAccentColor,
     required final VoiceAnnounceInterval voiceAnnounceInterval,
     required final int countdownSeconds,
   }) = _$SettingsStateImpl;
@@ -216,7 +236,9 @@ abstract class _SettingsState implements SettingsState {
   @override
   ThemeMode get themeMode;
   @override
-  DialTheme get dialTheme;
+  DialFaceStyle get dialFaceStyle;
+  @override
+  DialAccentColor get dialAccentColor;
   @override
   VoiceAnnounceInterval get voiceAnnounceInterval;
   @override

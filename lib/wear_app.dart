@@ -16,8 +16,8 @@ class TikTalkWearApp extends ConsumerWidget {
       title: 'TikTalk Wear',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.dark,
-      theme: AppTheme.dark(settings.dialTheme),
-      darkTheme: AppTheme.dark(settings.dialTheme),
+      theme: AppTheme.dark(settings.dialAccentColor.value),
+      darkTheme: AppTheme.dark(settings.dialAccentColor.value),
       home: const WearTimerScreen(),
     );
   }

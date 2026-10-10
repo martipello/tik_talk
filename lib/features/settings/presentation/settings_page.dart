@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/dial_theme.dart';
+import '../../../core/theme/dial_accent_color.dart';
+import '../../../core/theme/dial_face_style.dart';
 import '../../../core/widgets/view_constraint.dart';
 import '../providers/settings_notifier.dart';
 import '../providers/voice_announce_interval.dart';
@@ -27,12 +28,20 @@ class SettingsPage extends ConsumerWidget {
                   notifier.updateThemeMode(isDark ? ThemeMode.dark : ThemeMode.light),
             ),
             const SizedBox(height: 16),
-            _SettingDropdown<DialTheme>(
+            _SettingDropdown<DialFaceStyle>(
               label: 'Watch face',
-              value: settings.dialTheme,
-              entries: DialTheme.values,
-              labelOf: (theme) => theme.displayName,
-              onSelected: notifier.updateDialTheme,
+              value: settings.dialFaceStyle,
+              entries: DialFaceStyle.values,
+              labelOf: (style) => style.displayName,
+              onSelected: notifier.updateDialFaceStyle,
+            ),
+            const SizedBox(height: 16),
+            _SettingDropdown<DialAccentColor>(
+              label: 'Color',
+              value: settings.dialAccentColor,
+              entries: DialAccentColor.values,
+              labelOf: (color) => color.displayName,
+              onSelected: notifier.updateDialAccentColor,
             ),
             const SizedBox(height: 16),
             _SettingDropdown<VoiceAnnounceInterval>(

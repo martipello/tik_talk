@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../core/services/shared_preferences_provider.dart';
-import '../../../core/theme/dial_theme.dart';
+import '../../../core/theme/dial_accent_color.dart';
+import '../../../core/theme/dial_face_style.dart';
 import 'settings_repository.dart';
 import 'settings_state.dart';
 import 'voice_announce_interval.dart';
@@ -21,8 +22,13 @@ class SettingsNotifier extends _$SettingsNotifier {
     await _repository.save(state);
   }
 
-  Future<void> updateDialTheme(DialTheme dialTheme) async {
-    state = state.copyWith(dialTheme: dialTheme);
+  Future<void> updateDialFaceStyle(DialFaceStyle dialFaceStyle) async {
+    state = state.copyWith(dialFaceStyle: dialFaceStyle);
+    await _repository.save(state);
+  }
+
+  Future<void> updateDialAccentColor(DialAccentColor dialAccentColor) async {
+    state = state.copyWith(dialAccentColor: dialAccentColor);
     await _repository.save(state);
   }
 
