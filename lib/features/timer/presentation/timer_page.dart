@@ -44,11 +44,14 @@ class _TimerPageState extends ConsumerState<TimerPage> {
             children: [
               Expanded(
                 child: Center(
-                  child: WatchFace(
-                    timerState: timerState,
-                    dialFaceStyle: settings.dialFaceStyle,
-                    accentColor: settings.dialAccentColor.value,
-                    isGlowing: _isGlowing,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: WatchFace(
+                      timerState: timerState,
+                      dialFaceStyle: settings.dialFaceStyle,
+                      accentColor: settings.dialAccentColor.value,
+                      isGlowing: _isGlowing,
+                    ),
                   ),
                 ),
               ),
