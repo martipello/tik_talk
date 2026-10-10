@@ -192,11 +192,11 @@ class _StopwatchFacePainter extends CustomPainter {
     required this.isGlowing,
   });
 
-  // Needs to be wide enough for the drop shadow's blur (sigma 10, so it
-  // fades over ~3x that) to trail off naturally before hitting the
-  // ClipRect edge in WatchFace - too tight and the blur gets cut off with a
-  // visible hard edge instead of fading out.
-  static const _margin = 30.0;
+  // Needs to be wide enough for the drop shadow's blur (sigma 6, so it fades
+  // over ~3x that) to trail off naturally before hitting the ClipRect edge
+  // in WatchFace - too tight and the blur gets cut off with a visible hard
+  // edge instead of fading out.
+  static const _margin = 18.0;
   static const _subDialRadiusFactor = 0.10;
   static const _subDialDistanceFactor = 0.5;
   static const _minutesDialClockAngleDegrees = 35.0;
@@ -297,7 +297,7 @@ class _StopwatchFacePainter extends CustomPainter {
   void _paintShadow(Canvas canvas, Offset center, double radius) {
     final shadowPaint = Paint()
       ..color = Colors.black.withValues(alpha: 0.3)
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 10);
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
     canvas.drawCircle(center + const Offset(0, 5), radius, shadowPaint);
   }
 
