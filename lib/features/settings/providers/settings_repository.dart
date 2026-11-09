@@ -16,6 +16,7 @@ class SettingsRepository {
   static const _dialAccentColorKey = 'dial_accent_color';
   static const _voiceAnnounceIntervalKey = 'voice_announce_interval';
   static const _countdownSecondsKey = 'countdown_seconds';
+  static const _ttsMutedKey = 'tts_muted';
 
   SettingsState load() {
     final initial = SettingsState.initial();
@@ -24,6 +25,7 @@ class SettingsRepository {
     final dialAccentColorName = _preferences.getString(_dialAccentColorKey);
     final voiceIntervalName = _preferences.getString(_voiceAnnounceIntervalKey);
     final countdownSeconds = _preferences.getInt(_countdownSecondsKey);
+    final ttsMuted = _preferences.getBool(_ttsMutedKey);
 
     return initial.copyWith(
       themeMode: ThemeMode.values.firstWhere(
@@ -43,6 +45,7 @@ class SettingsRepository {
         orElse: () => initial.voiceAnnounceInterval,
       ),
       countdownSeconds: countdownSeconds ?? initial.countdownSeconds,
+      ttsMuted: ttsMuted ?? initial.ttsMuted,
     );
   }
 
@@ -52,5 +55,6 @@ class SettingsRepository {
     await _preferences.setString(_dialAccentColorKey, state.dialAccentColor.name);
     await _preferences.setString(_voiceAnnounceIntervalKey, state.voiceAnnounceInterval.name);
     await _preferences.setInt(_countdownSecondsKey, state.countdownSeconds);
+    await _preferences.setBool(_ttsMutedKey, state.ttsMuted);
   }
 }

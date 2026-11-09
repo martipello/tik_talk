@@ -19,9 +19,14 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$TimerState {
   TimerStatus get status => throw _privateConstructorUsedError;
   Duration get elapsed => throw _privateConstructorUsedError;
-  List<Duration> get laps => throw _privateConstructorUsedError;
+  List<Lap> get laps => throw _privateConstructorUsedError;
   int get countdownSecondsRemaining => throw _privateConstructorUsedError;
   double get countdownDialValue => throw _privateConstructorUsedError;
+  String? get label =>
+      throw _privateConstructorUsedError; // Set when this state originated from resuming a saved history entry, so
+  // stop() can update that entry in place instead of inserting a second
+  // one for the same session.
+  int? get resumedSessionId => throw _privateConstructorUsedError;
 
   /// Create a copy of TimerState
   /// with the given fields replaced by the non-null parameter values.
@@ -40,9 +45,11 @@ abstract class $TimerStateCopyWith<$Res> {
   $Res call({
     TimerStatus status,
     Duration elapsed,
-    List<Duration> laps,
+    List<Lap> laps,
     int countdownSecondsRemaining,
     double countdownDialValue,
+    String? label,
+    int? resumedSessionId,
   });
 }
 
@@ -66,6 +73,8 @@ class _$TimerStateCopyWithImpl<$Res, $Val extends TimerState>
     Object? laps = null,
     Object? countdownSecondsRemaining = null,
     Object? countdownDialValue = null,
+    Object? label = freezed,
+    Object? resumedSessionId = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -80,7 +89,7 @@ class _$TimerStateCopyWithImpl<$Res, $Val extends TimerState>
             laps: null == laps
                 ? _value.laps
                 : laps // ignore: cast_nullable_to_non_nullable
-                      as List<Duration>,
+                      as List<Lap>,
             countdownSecondsRemaining: null == countdownSecondsRemaining
                 ? _value.countdownSecondsRemaining
                 : countdownSecondsRemaining // ignore: cast_nullable_to_non_nullable
@@ -89,6 +98,14 @@ class _$TimerStateCopyWithImpl<$Res, $Val extends TimerState>
                 ? _value.countdownDialValue
                 : countdownDialValue // ignore: cast_nullable_to_non_nullable
                       as double,
+            label: freezed == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            resumedSessionId: freezed == resumedSessionId
+                ? _value.resumedSessionId
+                : resumedSessionId // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -107,9 +124,11 @@ abstract class _$$TimerStateImplCopyWith<$Res>
   $Res call({
     TimerStatus status,
     Duration elapsed,
-    List<Duration> laps,
+    List<Lap> laps,
     int countdownSecondsRemaining,
     double countdownDialValue,
+    String? label,
+    int? resumedSessionId,
   });
 }
 
@@ -132,6 +151,8 @@ class __$$TimerStateImplCopyWithImpl<$Res>
     Object? laps = null,
     Object? countdownSecondsRemaining = null,
     Object? countdownDialValue = null,
+    Object? label = freezed,
+    Object? resumedSessionId = freezed,
   }) {
     return _then(
       _$TimerStateImpl(
@@ -146,7 +167,7 @@ class __$$TimerStateImplCopyWithImpl<$Res>
         laps: null == laps
             ? _value._laps
             : laps // ignore: cast_nullable_to_non_nullable
-                  as List<Duration>,
+                  as List<Lap>,
         countdownSecondsRemaining: null == countdownSecondsRemaining
             ? _value.countdownSecondsRemaining
             : countdownSecondsRemaining // ignore: cast_nullable_to_non_nullable
@@ -155,6 +176,14 @@ class __$$TimerStateImplCopyWithImpl<$Res>
             ? _value.countdownDialValue
             : countdownDialValue // ignore: cast_nullable_to_non_nullable
                   as double,
+        label: freezed == label
+            ? _value.label
+            : label // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        resumedSessionId: freezed == resumedSessionId
+            ? _value.resumedSessionId
+            : resumedSessionId // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -166,18 +195,20 @@ class _$TimerStateImpl implements _TimerState {
   const _$TimerStateImpl({
     required this.status,
     required this.elapsed,
-    required final List<Duration> laps,
+    required final List<Lap> laps,
     required this.countdownSecondsRemaining,
     required this.countdownDialValue,
+    this.label,
+    this.resumedSessionId,
   }) : _laps = laps;
 
   @override
   final TimerStatus status;
   @override
   final Duration elapsed;
-  final List<Duration> _laps;
+  final List<Lap> _laps;
   @override
-  List<Duration> get laps {
+  List<Lap> get laps {
     if (_laps is EqualUnmodifiableListView) return _laps;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_laps);
@@ -187,10 +218,17 @@ class _$TimerStateImpl implements _TimerState {
   final int countdownSecondsRemaining;
   @override
   final double countdownDialValue;
+  @override
+  final String? label;
+  // Set when this state originated from resuming a saved history entry, so
+  // stop() can update that entry in place instead of inserting a second
+  // one for the same session.
+  @override
+  final int? resumedSessionId;
 
   @override
   String toString() {
-    return 'TimerState(status: $status, elapsed: $elapsed, laps: $laps, countdownSecondsRemaining: $countdownSecondsRemaining, countdownDialValue: $countdownDialValue)';
+    return 'TimerState(status: $status, elapsed: $elapsed, laps: $laps, countdownSecondsRemaining: $countdownSecondsRemaining, countdownDialValue: $countdownDialValue, label: $label, resumedSessionId: $resumedSessionId)';
   }
 
   @override
@@ -207,7 +245,10 @@ class _$TimerStateImpl implements _TimerState {
                 ) ||
                 other.countdownSecondsRemaining == countdownSecondsRemaining) &&
             (identical(other.countdownDialValue, countdownDialValue) ||
-                other.countdownDialValue == countdownDialValue));
+                other.countdownDialValue == countdownDialValue) &&
+            (identical(other.label, label) || other.label == label) &&
+            (identical(other.resumedSessionId, resumedSessionId) ||
+                other.resumedSessionId == resumedSessionId));
   }
 
   @override
@@ -218,6 +259,8 @@ class _$TimerStateImpl implements _TimerState {
     const DeepCollectionEquality().hash(_laps),
     countdownSecondsRemaining,
     countdownDialValue,
+    label,
+    resumedSessionId,
   );
 
   /// Create a copy of TimerState
@@ -233,9 +276,11 @@ abstract class _TimerState implements TimerState {
   const factory _TimerState({
     required final TimerStatus status,
     required final Duration elapsed,
-    required final List<Duration> laps,
+    required final List<Lap> laps,
     required final int countdownSecondsRemaining,
     required final double countdownDialValue,
+    final String? label,
+    final int? resumedSessionId,
   }) = _$TimerStateImpl;
 
   @override
@@ -243,11 +288,17 @@ abstract class _TimerState implements TimerState {
   @override
   Duration get elapsed;
   @override
-  List<Duration> get laps;
+  List<Lap> get laps;
   @override
   int get countdownSecondsRemaining;
   @override
   double get countdownDialValue;
+  @override
+  String? get label; // Set when this state originated from resuming a saved history entry, so
+  // stop() can update that entry in place instead of inserting a second
+  // one for the same session.
+  @override
+  int? get resumedSessionId;
 
   /// Create a copy of TimerState
   /// with the given fields replaced by the non-null parameter values.

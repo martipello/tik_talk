@@ -1,13 +1,15 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 import 'package:segment_display/segment_display.dart';
 
+import '../../../../core/config/build_flavor.dart';
 import '../../../../core/extensions/duration_extension.dart';
 import '../../../../core/theme/dial_face_style.dart';
 import '../../providers/timer_state.dart';
 import '../../providers/timer_status.dart';
+import 'fluid_glass2_face.dart';
+import 'tik_talk_face.dart';
 
 // Backlight glow is a brightened tint of the dial's own accent color, so it
 // always harmonizes with whatever theme is picked, rather than a fixed hue
@@ -32,28 +34,31 @@ class WatchFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final size = math.min(constraints.maxWidth, constraints.maxHeight);
-        return ClipRect(
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: switch (dialFaceStyle) {
-              DialFaceStyle.classicStopwatch => _ClassicStopwatchFace(
-                  timerState: timerState,
-                  accentColor: accentColor,
-                  isGlowing: isGlowing,
-                ),
-              DialFaceStyle.fluidGlass => _FluidGlassFace(
-                  timerState: timerState,
-                  accentColor: accentColor,
-                  isGlowing: isGlowing,
-                ),
-            },
-          ),
-        );
-      },
+    // AspectRatio (not a self-measuring LayoutBuilder) so sizing stays
+    // correct when the parent only bounds width and leaves height unbounded
+    // (e.g. inside a scrollable column) - this is exactly the case
+    // AspectRatio is designed to resolve.
+    return AspectRatio(
+      aspectRatio: 1,
+      child: ClipRect(
+        child: switch (dialFaceStyle) {
+          DialFaceStyle.tikTalk => TikTalkFace(
+              timerState: timerState,
+              accentColor: accentColor,
+              isGlowing: isGlowing,
+            ),
+          DialFaceStyle.classicStopwatch => _ClassicStopwatchFace(
+              timerState: timerState,
+              accentColor: accentColor,
+              isGlowing: isGlowing,
+            ),
+          DialFaceStyle.fluidGlass2 => FluidGlass2Face(
+              timerState: timerState,
+              accentColor: accentColor,
+              isGlowing: isGlowing,
+            ),
+        },
+      ),
     );
   }
 }
@@ -71,6 +76,35 @@ class _ClassicStopwatchFace extends StatelessWidget {
 
   static const _digitalReadoutOffsetFraction = 0.36;
 
+  // The readout widths below used to be flat pixel values (168/150) - fine
+  // at whatever canvas size they were tuned against (a typical phone-sized
+  // face), but wrong anywhere smaller: this face's own circle fills nearly
+  // the whole canvas (radius = shortestSide/2 - a small fixed margin, unlike
+  // TikTalkFace's deliberately small sub-fraction of its canvas), so on a
+  // much smaller canvas - the watch's own dial, barely 150-200px - a flat
+  // 168px readout is wider than the entire face, overflowing past the case
+  // into whatever sits next to it. Expressing both as a fraction of the
+  // actual face diameter (mirroring TikTalkFace's own fix for the same
+  // class of bug) keeps the readout's size relative to the case constant
+  // across every screen instead of only the one it was tuned against.
+  static const _clockWidthFraction = 0.5;
+  static const _clockHeightFraction = 0.2;
+  static const _countdownWidthFraction = 0.45;
+  // _CountdownDigit wraps its content in AnimatedSwitcher (for the scale/
+  // fade between consecutive numbers) - unlike TikTalkFace's countdown
+  // digit, which swaps widgets directly with no such wrapper. That extra
+  // layer leaves FittedBox's incoming height constraint merely loose
+  // rather than tight, so on a small enough canvas (the watch's) it can
+  // size itself to the SevenSegmentDisplay's own large natural/unscaled
+  // size instead of actually shrinking to fit - BoxFit.scaleDown only
+  // shrinks relative to a box it's actually been given, and a loose
+  // constraint lets FittedBox claim however much height is available
+  // rather than a value tied to our intended width. An explicit height
+  // (not just width) forces that box to be tight on both axes, so the fit
+  // calculation is well-defined regardless of what AnimatedSwitcher does
+  // above it.
+  static const _countdownHeightFraction = 0.55;
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -79,50 +113,78 @@ class _ClassicStopwatchFace extends StatelessWidget {
     final tickColor = isDark ? Colors.white : Colors.black;
     final readoutColor = isGlowing ? _glowColorFor(accentColor) : accentColor;
 
-    return CustomPaint(
-      painter: _StopwatchFacePainter(
-        timerState: timerState,
-        accentColor: accentColor,
-        faceColor: faceColor,
-        tickColor: tickColor,
-        isGlowing: isGlowing,
-      ),
-      child: isCountingDown
-          ? Center(
-              child: _CountdownDigit(
-                value: timerState.countdownSecondsRemaining,
-                accentColor: readoutColor,
-              ),
-            )
-          : Align(
-              alignment: const Alignment(0, _digitalReadoutOffsetFraction),
-              child: _DigitalReadout(
-                value: timerState.elapsed.formattedClockWithTenths,
-                accentColor: readoutColor,
-                isDark: isDark,
-              ),
-            ),
+    // Wear-only: no main hand, and the running readout centred right where
+    // that hand's pivot would have been - the watch's much smaller face
+    // doesn't have room to keep a swept hand and a legible digital readout
+    // comfortably apart the way the phone/web's bigger canvas does, so
+    // rather than fight over the same space, the hand is dropped entirely
+    // and the readout takes the dial's centre instead.
+    final isWear = AppConfig.isWear;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final faceDiameter = constraints.biggest.shortestSide - _classicFaceMargin * 2;
+
+        return CustomPaint(
+          painter: _StopwatchFacePainter(
+            timerState: timerState,
+            accentColor: accentColor,
+            faceColor: faceColor,
+            tickColor: tickColor,
+            isGlowing: isGlowing,
+            isWear: isWear,
+          ),
+          child: isCountingDown
+              ? Center(
+                  child: _CountdownDigit(
+                    value: timerState.countdownSecondsRemaining,
+                    accentColor: readoutColor,
+                    width: faceDiameter * _countdownWidthFraction,
+                    height: faceDiameter * _countdownHeightFraction,
+                  ),
+                )
+              : Align(
+                  alignment: Alignment(0, isWear ? 0 : _digitalReadoutOffsetFraction),
+                  child: _DigitalReadout(
+                    value: timerState.elapsed.formattedClockWithTenths,
+                    accentColor: readoutColor,
+                    isDark: isDark,
+                    width: faceDiameter * _clockWidthFraction,
+                    height: faceDiameter * _clockHeightFraction,
+                  ),
+                ),
+        );
+      },
     );
   }
 }
 
 class _DigitalReadout extends StatelessWidget {
-  const _DigitalReadout({required this.value, required this.accentColor, required this.isDark});
+  const _DigitalReadout({
+    required this.value,
+    required this.accentColor,
+    required this.isDark,
+    required this.width,
+    required this.height,
+  });
 
   final String value;
   final Color accentColor;
   final bool isDark;
+  final double width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
-    final panelColor = isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.08);
+    final panelColor = isDark ? Colors.black.withValues(alpha: 0.35) : Colors.black.withValues(alpha: 0.08);
 
     return DecoratedBox(
       decoration: BoxDecoration(color: panelColor, borderRadius: BorderRadius.circular(6)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         child: SizedBox(
-          width: 168,
+          width: width,
+          height: height,
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: SevenSegmentDisplay(
@@ -143,10 +205,17 @@ class _DigitalReadout extends StatelessWidget {
 }
 
 class _CountdownDigit extends StatelessWidget {
-  const _CountdownDigit({required this.value, required this.accentColor});
+  const _CountdownDigit({
+    required this.value,
+    required this.accentColor,
+    required this.width,
+    required this.height,
+  });
 
   final int value;
   final Color accentColor;
+  final double width;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +233,8 @@ class _CountdownDigit extends StatelessWidget {
       },
       child: SizedBox(
         key: ValueKey(value),
-        width: 150,
+        width: width,
+        height: height,
         child: FittedBox(
           fit: BoxFit.scaleDown,
           child: SevenSegmentDisplay(
@@ -183,6 +253,15 @@ class _CountdownDigit extends StatelessWidget {
   }
 }
 
+// Needs to be wide enough for the drop shadow's blur (sigma 4, so it fades
+// over ~3x that) to trail off naturally before hitting the ClipRect edge in
+// WatchFace - too tight and the blur gets cut off with a visible hard edge
+// instead of fading out. Hoisted out of _StopwatchFacePainter (file-level,
+// not just that class's own constant) so _ClassicStopwatchFace can size its
+// digital readout against the same face diameter the painter itself draws,
+// rather than guessing at a separate margin.
+const _classicFaceMargin = 13.0;
+
 class _StopwatchFacePainter extends CustomPainter {
   _StopwatchFacePainter({
     required this.timerState,
@@ -190,17 +269,23 @@ class _StopwatchFacePainter extends CustomPainter {
     required this.faceColor,
     required this.tickColor,
     required this.isGlowing,
+    this.isWear = false,
   });
 
-  // Needs to be wide enough for the drop shadow's blur (sigma 4, so it fades
-  // over ~3x that) to trail off naturally before hitting the ClipRect edge
-  // in WatchFace - too tight and the blur gets cut off with a visible hard
-  // edge instead of fading out.
-  static const _margin = 13.0;
   static const _subDialRadiusFactor = 0.10;
   static const _subDialDistanceFactor = 0.5;
   static const _minutesDialClockAngleDegrees = 30.0;
   static const _runningDialClockAngleDegrees = 75.0;
+  // Wear-only: both sub-dials sit together near the top (symmetric either
+  // side of 12 o'clock) instead of the phone/web's 30°/75° pair - the
+  // centred digital readout that replaces the main hand on Wear (see
+  // _ClassicStopwatchFace.build) is a wide box reaching past where the
+  // 75°-positioned running dial normally sits, overlapping it. ±25° keeps
+  // the two sub-dials clear of each other (their horizontal separation at
+  // this angle and _subDialDistanceFactor comfortably exceeds twice their
+  // own radius) and well clear of the centred readout below them.
+  static const _wearMinutesDialClockAngleDegrees = -25.0;
+  static const _wearRunningDialClockAngleDegrees = 25.0;
   static const _outerNotchCount = 48;
   static const _caseColor = Color(0xFF2B2B2E);
 
@@ -209,10 +294,13 @@ class _StopwatchFacePainter extends CustomPainter {
   final Color faceColor;
   final Color tickColor;
   final bool isGlowing;
+  // Wear OS drops the main hand and its pivot hub entirely, and moves both
+  // sub-dials up to the top - see _ClassicStopwatchFace.build.
+  final bool isWear;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final radius = size.shortestSide / 2 - _margin;
+    final radius = size.shortestSide / 2 - _classicFaceMargin;
     final center = size.center(Offset.zero);
 
     if (isGlowing) _paintGlow(canvas, center, radius);
@@ -225,20 +313,25 @@ class _StopwatchFacePainter extends CustomPainter {
     final handColor = isGlowing ? _glowColorFor(accentColor) : accentColor;
 
     _paintDial(canvas, center: center, radius: radius - 18, tickCount: 60, majorEvery: 5);
-    _paintHand(
-      canvas,
-      center: center,
-      length: radius - 40,
-      angle: _mainHandAngle(),
-      strokeWidth: 2.5,
-      color: handColor,
-    );
+    if (!isWear) {
+      _paintHand(
+        canvas,
+        center: center,
+        length: radius - 40,
+        angle: _mainHandAngle(),
+        strokeWidth: 2.5,
+        color: handColor,
+      );
+    }
 
     final subDialRadius = radius * _subDialRadiusFactor;
     final subDialDistance = radius * _subDialDistanceFactor;
 
-    final minutesCenter =
-        center + _offsetForClockAngle(_minutesDialClockAngleDegrees, subDialDistance);
+    final minutesCenter = center +
+        _offsetForClockAngle(
+          isWear ? _wearMinutesDialClockAngleDegrees : _minutesDialClockAngleDegrees,
+          subDialDistance,
+        );
     final wholeMinutes = timerState.elapsed.inMinutes % 60;
     final minutesAngle = _angleForFraction(wholeMinutes / 60);
     _paintSubDialWell(canvas, minutesCenter, subDialRadius);
@@ -252,8 +345,11 @@ class _StopwatchFacePainter extends CustomPainter {
       color: handColor.withValues(alpha: 0.85),
     );
 
-    final runningCenter =
-        center + _offsetForClockAngle(_runningDialClockAngleDegrees, subDialDistance);
+    final runningCenter = center +
+        _offsetForClockAngle(
+          isWear ? _wearRunningDialClockAngleDegrees : _runningDialClockAngleDegrees,
+          subDialDistance,
+        );
     final runningAngle = _angleForFraction((timerState.elapsed.inMilliseconds % 1000) / 1000);
     _paintSubDialWell(canvas, runningCenter, subDialRadius);
     _paintDial(canvas, center: runningCenter, radius: subDialRadius, tickCount: 10, majorEvery: 5);
@@ -266,7 +362,10 @@ class _StopwatchFacePainter extends CustomPainter {
       color: handColor.withValues(alpha: 0.85),
     );
 
-    _paintHub(canvas, center, handColor);
+    // The hub is the main hand's own pivot cap - with no hand to pin down
+    // on Wear, it's just a stray dot sitting on top of the centred readout
+    // now in its place, not a part of the face that stands on its own.
+    if (!isWear) _paintHub(canvas, center, handColor);
   }
 
   double _mainHandAngle() {
@@ -425,45 +524,6 @@ class _StopwatchFacePainter extends CustomPainter {
       oldDelegate.timerState != timerState ||
       oldDelegate.accentColor != accentColor ||
       oldDelegate.faceColor != faceColor ||
-      oldDelegate.isGlowing != isGlowing;
-}
-
-class _FluidGlassFace extends StatelessWidget {
-  const _FluidGlassFace({required this.timerState, required this.accentColor, required this.isGlowing});
-
-  final TimerState timerState;
-  final Color accentColor;
-  final bool isGlowing;
-
-  @override
-  Widget build(BuildContext context) {
-    final secondsIntoMinute = timerState.elapsed.inMilliseconds % 60000;
-    final fillLevel = secondsIntoMinute / 60000;
-    final glowColor = _glowColorFor(accentColor);
-    final color = isGlowing ? glowColor : accentColor;
-
-    return DecoratedBox(
-      decoration: isGlowing
-          ? BoxDecoration(
-              shape: BoxShape.circle,
-              boxShadow: [BoxShadow(color: glowColor.withValues(alpha: 0.6), blurRadius: 6)],
-            )
-          : const BoxDecoration(),
-      child: LiquidCircularProgressIndicator(
-        value: fillLevel,
-        valueColor: AlwaysStoppedAnimation(color),
-        backgroundColor: color.withValues(alpha: 0.12),
-        borderColor: color,
-        borderWidth: 3,
-        center: Text(
-          timerState.status == TimerStatus.countingDown
-              ? timerState.countdownSecondsRemaining.toString()
-              : timerState.elapsed.formattedClockWithTenths,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium?.copyWith(fontFeatures: const [FontFeature.tabularFigures()]),
-        ),
-      ),
-    );
-  }
+      oldDelegate.isGlowing != isGlowing ||
+      oldDelegate.isWear != isWear;
 }

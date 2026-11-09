@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/layout/app_breakpoints.dart';
 import '../../../core/theme/dial_accent_color.dart';
 import '../../../core/theme/dial_face_style.dart';
 import '../../../core/widgets/view_constraint.dart';
@@ -14,18 +15,22 @@ class SettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsNotifierProvider);
     final notifier = ref.read(settingsNotifierProvider.notifier);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBreakpoints.isWide(context)
+          ? null
+          : AppBar(title: const Text('Settings')),
       body: ViewConstraint(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           children: [
             SwitchListTile(
               title: const Text('Dark mode'),
-              value: settings.themeMode == ThemeMode.dark,
-              onChanged: (isDark) =>
-                  notifier.updateThemeMode(isDark ? ThemeMode.dark : ThemeMode.light),
+              value: isDark,
+              onChanged: (isDark) => notifier.updateThemeMode(
+                isDark ? ThemeMode.dark : ThemeMode.light,
+              ),
             ),
             const SizedBox(height: 16),
             _SettingDropdown<DialFaceStyle>(
@@ -83,7 +88,9 @@ class _SettingDropdown<T> extends StatelessWidget {
         if (selected != null) onSelected(selected);
       },
       dropdownMenuEntries: entries
-          .map((entry) => DropdownMenuEntry(value: entry, label: labelOf(entry)))
+          .map(
+            (entry) => DropdownMenuEntry(value: entry, label: labelOf(entry)),
+          )
           .toList(),
     );
   }

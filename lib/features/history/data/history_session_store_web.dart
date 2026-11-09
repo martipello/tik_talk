@@ -30,6 +30,15 @@ class WebHistorySessionStore implements HistorySessionStore {
   }
 
   @override
+  Future<void> update(TimerSession session) async {
+    final sessions = _readAll();
+    final index = sessions.indexWhere((existing) => existing.id == session.id);
+    if (index == -1) return;
+    sessions[index] = session;
+    await _writeAll(sessions);
+  }
+
+  @override
   Future<void> delete(int id) async {
     final sessions = _readAll()..removeWhere((session) => session.id == id);
     await _writeAll(sessions);

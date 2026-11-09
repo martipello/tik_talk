@@ -20,7 +20,8 @@ mixin _$TimerSession {
   int? get id => throw _privateConstructorUsedError;
   DateTime get completedAt => throw _privateConstructorUsedError;
   Duration get duration => throw _privateConstructorUsedError;
-  List<Duration> get laps => throw _privateConstructorUsedError;
+  String? get label => throw _privateConstructorUsedError;
+  List<Lap> get laps => throw _privateConstructorUsedError;
 
   /// Create a copy of TimerSession
   /// with the given fields replaced by the non-null parameter values.
@@ -40,7 +41,8 @@ abstract class $TimerSessionCopyWith<$Res> {
     int? id,
     DateTime completedAt,
     Duration duration,
-    List<Duration> laps,
+    String? label,
+    List<Lap> laps,
   });
 }
 
@@ -62,6 +64,7 @@ class _$TimerSessionCopyWithImpl<$Res, $Val extends TimerSession>
     Object? id = freezed,
     Object? completedAt = null,
     Object? duration = null,
+    Object? label = freezed,
     Object? laps = null,
   }) {
     return _then(
@@ -78,10 +81,14 @@ class _$TimerSessionCopyWithImpl<$Res, $Val extends TimerSession>
                 ? _value.duration
                 : duration // ignore: cast_nullable_to_non_nullable
                       as Duration,
+            label: freezed == label
+                ? _value.label
+                : label // ignore: cast_nullable_to_non_nullable
+                      as String?,
             laps: null == laps
                 ? _value.laps
                 : laps // ignore: cast_nullable_to_non_nullable
-                      as List<Duration>,
+                      as List<Lap>,
           )
           as $Val,
     );
@@ -101,7 +108,8 @@ abstract class _$$TimerSessionImplCopyWith<$Res>
     int? id,
     DateTime completedAt,
     Duration duration,
-    List<Duration> laps,
+    String? label,
+    List<Lap> laps,
   });
 }
 
@@ -122,6 +130,7 @@ class __$$TimerSessionImplCopyWithImpl<$Res>
     Object? id = freezed,
     Object? completedAt = null,
     Object? duration = null,
+    Object? label = freezed,
     Object? laps = null,
   }) {
     return _then(
@@ -138,10 +147,14 @@ class __$$TimerSessionImplCopyWithImpl<$Res>
             ? _value.duration
             : duration // ignore: cast_nullable_to_non_nullable
                   as Duration,
+        label: freezed == label
+            ? _value.label
+            : label // ignore: cast_nullable_to_non_nullable
+                  as String?,
         laps: null == laps
             ? _value._laps
             : laps // ignore: cast_nullable_to_non_nullable
-                  as List<Duration>,
+                  as List<Lap>,
       ),
     );
   }
@@ -154,7 +167,8 @@ class _$TimerSessionImpl implements _TimerSession {
     required this.id,
     required this.completedAt,
     required this.duration,
-    required final List<Duration> laps,
+    required this.label,
+    required final List<Lap> laps,
   }) : _laps = laps;
 
   @override
@@ -163,9 +177,11 @@ class _$TimerSessionImpl implements _TimerSession {
   final DateTime completedAt;
   @override
   final Duration duration;
-  final List<Duration> _laps;
   @override
-  List<Duration> get laps {
+  final String? label;
+  final List<Lap> _laps;
+  @override
+  List<Lap> get laps {
     if (_laps is EqualUnmodifiableListView) return _laps;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_laps);
@@ -173,7 +189,7 @@ class _$TimerSessionImpl implements _TimerSession {
 
   @override
   String toString() {
-    return 'TimerSession(id: $id, completedAt: $completedAt, duration: $duration, laps: $laps)';
+    return 'TimerSession(id: $id, completedAt: $completedAt, duration: $duration, label: $label, laps: $laps)';
   }
 
   @override
@@ -186,6 +202,7 @@ class _$TimerSessionImpl implements _TimerSession {
                 other.completedAt == completedAt) &&
             (identical(other.duration, duration) ||
                 other.duration == duration) &&
+            (identical(other.label, label) || other.label == label) &&
             const DeepCollectionEquality().equals(other._laps, _laps));
   }
 
@@ -195,6 +212,7 @@ class _$TimerSessionImpl implements _TimerSession {
     id,
     completedAt,
     duration,
+    label,
     const DeepCollectionEquality().hash(_laps),
   );
 
@@ -212,7 +230,8 @@ abstract class _TimerSession implements TimerSession {
     required final int? id,
     required final DateTime completedAt,
     required final Duration duration,
-    required final List<Duration> laps,
+    required final String? label,
+    required final List<Lap> laps,
   }) = _$TimerSessionImpl;
 
   @override
@@ -222,7 +241,9 @@ abstract class _TimerSession implements TimerSession {
   @override
   Duration get duration;
   @override
-  List<Duration> get laps;
+  String? get label;
+  @override
+  List<Lap> get laps;
 
   /// Create a copy of TimerSession
   /// with the given fields replaced by the non-null parameter values.

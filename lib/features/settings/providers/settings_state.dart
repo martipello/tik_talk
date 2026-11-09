@@ -15,13 +15,15 @@ class SettingsState with _$SettingsState {
     required DialAccentColor dialAccentColor,
     required VoiceAnnounceInterval voiceAnnounceInterval,
     required int countdownSeconds,
+    required bool ttsMuted,
   }) = _SettingsState;
 
   factory SettingsState.initial() => const SettingsState(
         themeMode: ThemeMode.system,
-        dialFaceStyle: DialFaceStyle.classicStopwatch,
-        dialAccentColor: DialAccentColor.orange,
+        dialFaceStyle: DialFaceStyle.tikTalk,
+        dialAccentColor: DialAccentColor.tiktok,
         voiceAnnounceInterval: VoiceAnnounceInterval.everyMinute,
         countdownSeconds: 0,
+        ttsMuted: false,
       );
 }

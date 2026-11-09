@@ -23,6 +23,7 @@ mixin _$SettingsState {
   VoiceAnnounceInterval get voiceAnnounceInterval =>
       throw _privateConstructorUsedError;
   int get countdownSeconds => throw _privateConstructorUsedError;
+  bool get ttsMuted => throw _privateConstructorUsedError;
 
   /// Create a copy of SettingsState
   /// with the given fields replaced by the non-null parameter values.
@@ -44,6 +45,7 @@ abstract class $SettingsStateCopyWith<$Res> {
     DialAccentColor dialAccentColor,
     VoiceAnnounceInterval voiceAnnounceInterval,
     int countdownSeconds,
+    bool ttsMuted,
   });
 }
 
@@ -67,6 +69,7 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
     Object? dialAccentColor = null,
     Object? voiceAnnounceInterval = null,
     Object? countdownSeconds = null,
+    Object? ttsMuted = null,
   }) {
     return _then(
       _value.copyWith(
@@ -90,6 +93,10 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
                 ? _value.countdownSeconds
                 : countdownSeconds // ignore: cast_nullable_to_non_nullable
                       as int,
+            ttsMuted: null == ttsMuted
+                ? _value.ttsMuted
+                : ttsMuted // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -111,6 +118,7 @@ abstract class _$$SettingsStateImplCopyWith<$Res>
     DialAccentColor dialAccentColor,
     VoiceAnnounceInterval voiceAnnounceInterval,
     int countdownSeconds,
+    bool ttsMuted,
   });
 }
 
@@ -133,6 +141,7 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
     Object? dialAccentColor = null,
     Object? voiceAnnounceInterval = null,
     Object? countdownSeconds = null,
+    Object? ttsMuted = null,
   }) {
     return _then(
       _$SettingsStateImpl(
@@ -156,6 +165,10 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
             ? _value.countdownSeconds
             : countdownSeconds // ignore: cast_nullable_to_non_nullable
                   as int,
+        ttsMuted: null == ttsMuted
+            ? _value.ttsMuted
+            : ttsMuted // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -170,6 +183,7 @@ class _$SettingsStateImpl implements _SettingsState {
     required this.dialAccentColor,
     required this.voiceAnnounceInterval,
     required this.countdownSeconds,
+    required this.ttsMuted,
   });
 
   @override
@@ -182,10 +196,12 @@ class _$SettingsStateImpl implements _SettingsState {
   final VoiceAnnounceInterval voiceAnnounceInterval;
   @override
   final int countdownSeconds;
+  @override
+  final bool ttsMuted;
 
   @override
   String toString() {
-    return 'SettingsState(themeMode: $themeMode, dialFaceStyle: $dialFaceStyle, dialAccentColor: $dialAccentColor, voiceAnnounceInterval: $voiceAnnounceInterval, countdownSeconds: $countdownSeconds)';
+    return 'SettingsState(themeMode: $themeMode, dialFaceStyle: $dialFaceStyle, dialAccentColor: $dialAccentColor, voiceAnnounceInterval: $voiceAnnounceInterval, countdownSeconds: $countdownSeconds, ttsMuted: $ttsMuted)';
   }
 
   @override
@@ -202,7 +218,9 @@ class _$SettingsStateImpl implements _SettingsState {
             (identical(other.voiceAnnounceInterval, voiceAnnounceInterval) ||
                 other.voiceAnnounceInterval == voiceAnnounceInterval) &&
             (identical(other.countdownSeconds, countdownSeconds) ||
-                other.countdownSeconds == countdownSeconds));
+                other.countdownSeconds == countdownSeconds) &&
+            (identical(other.ttsMuted, ttsMuted) ||
+                other.ttsMuted == ttsMuted));
   }
 
   @override
@@ -213,6 +231,7 @@ class _$SettingsStateImpl implements _SettingsState {
     dialAccentColor,
     voiceAnnounceInterval,
     countdownSeconds,
+    ttsMuted,
   );
 
   /// Create a copy of SettingsState
@@ -231,6 +250,7 @@ abstract class _SettingsState implements SettingsState {
     required final DialAccentColor dialAccentColor,
     required final VoiceAnnounceInterval voiceAnnounceInterval,
     required final int countdownSeconds,
+    required final bool ttsMuted,
   }) = _$SettingsStateImpl;
 
   @override
@@ -243,6 +263,8 @@ abstract class _SettingsState implements SettingsState {
   VoiceAnnounceInterval get voiceAnnounceInterval;
   @override
   int get countdownSeconds;
+  @override
+  bool get ttsMuted;
 
   /// Create a copy of SettingsState
   /// with the given fields replaced by the non-null parameter values.

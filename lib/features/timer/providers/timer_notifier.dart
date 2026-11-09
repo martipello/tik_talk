@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../../../core/models/lap.dart';
 import '../../../core/services/service_providers.dart';
 import '../../history/data/timer_session.dart';
 import '../../history/providers/history_notifier.dart';
@@ -11,7 +12,15 @@ import 'timer_status.dart';
 
 part 'timer_notifier.g.dart';
 
-@riverpod
+// keepAlive: HistoryPage resumes a session via a one-off ref.read, with no
+// guarantee anything is watching this provider yet (e.g. the Timer tab's
+// branch hasn't been built lazily if it's never been visited this session) -
+// autoDispose could tear the state back down before TimerPage's own watch
+// attaches, racily discarding the resumed session. The same persistence is
+// also just correct for a running stopwatch, which must not reset itself
+// just because nothing happens to be watching while the user is on another
+// tab.
+@Riverpod(keepAlive: true)
 class TimerNotifier extends _$TimerNotifier {
   Timer? _ticker;
   Timer? _countdownTicker;
@@ -48,16 +57,30 @@ class TimerNotifier extends _$TimerNotifier {
 
   void lap() {
     if (state.status != TimerStatus.running) return;
-    state = state.copyWith(laps: [...state.laps, state.elapsed]);
+    state = state.copyWith(laps: [...state.laps, Lap(elapsed: state.elapsed)]);
+  }
+
+  void relabelLap(int index, String? label) {
+    final laps = [...state.laps];
+    laps[index] = laps[index].copyWith(label: label);
+    state = state.copyWith(laps: laps);
   }
 
   Future<void> stop() async {
     _ticker?.cancel();
     _countdownTicker?.cancel();
     if (state.elapsed > Duration.zero) {
-      await ref
-          .read(historyNotifierProvider.notifier)
-          .addSession(duration: state.elapsed, laps: state.laps);
+      final historyNotifier = ref.read(historyNotifierProvider.notifier);
+      final resumedSessionId = state.resumedSessionId;
+      if (resumedSessionId != null) {
+        await historyNotifier.updateSession(
+          resumedSessionId,
+          duration: state.elapsed,
+          laps: state.laps,
+        );
+      } else {
+        await historyNotifier.addSession(duration: state.elapsed, laps: state.laps);
+      }
     }
     state = TimerState.initial();
   }
@@ -69,6 +92,8 @@ class TimerNotifier extends _$TimerNotifier {
       status: TimerStatus.paused,
       elapsed: session.duration,
       laps: session.laps,
+      label: session.label,
+      resumedSessionId: session.id,
     );
   }
 
@@ -79,7 +104,7 @@ class TimerNotifier extends _$TimerNotifier {
       countdownSecondsRemaining: countdownSeconds,
       countdownDialValue: startDialValue,
     );
-    unawaited(ref.read(ttsServiceProvider).speak('$countdownSeconds'));
+    _speak('$countdownSeconds');
     _countdownTicker?.cancel();
     _countdownTicker = Timer.periodic(const Duration(seconds: 1), (_) => _countdownTick());
   }
@@ -88,7 +113,7 @@ class TimerNotifier extends _$TimerNotifier {
     final remaining = state.countdownSecondsRemaining - 1;
     if (remaining <= 0) {
       _countdownTicker?.cancel();
-      unawaited(ref.read(ttsServiceProvider).speak('Go'));
+      _speak('Go');
       _beginRunning();
       return;
     }
@@ -97,7 +122,7 @@ class TimerNotifier extends _$TimerNotifier {
       countdownSecondsRemaining: remaining,
       countdownDialValue: state.countdownDialValue - 1,
     );
-    unawaited(ref.read(ttsServiceProvider).speak('$remaining'));
+    _speak('$remaining');
   }
 
   void _beginRunning() {
@@ -122,7 +147,13 @@ class TimerNotifier extends _$TimerNotifier {
     if (currentIntervalCount <= _lastAnnouncedIntervalCount) return;
 
     _lastAnnouncedIntervalCount = currentIntervalCount;
-    unawaited(ref.read(ttsServiceProvider).speak(_announceText(state.elapsed)));
+    final interval = ref.read(settingsNotifierProvider).voiceAnnounceInterval;
+    _speak(interval.speaksBareNumber ? '${state.elapsed.inSeconds}' : _announceText(state.elapsed));
+  }
+
+  void _speak(String text) {
+    if (ref.read(settingsNotifierProvider).ttsMuted) return;
+    unawaited(ref.read(ttsServiceProvider).speak(text));
   }
 
   int _currentIntervalCount() {
@@ -134,8 +165,14 @@ class TimerNotifier extends _$TimerNotifier {
   String _announceText(Duration duration) {
     final minutes = duration.inMinutes;
     final seconds = duration.inSeconds % 60;
-    if (minutes == 0) return '$seconds seconds';
-    if (seconds == 0) return '$minutes minutes';
-    return '$minutes minutes $seconds seconds';
+    final minutesText = '$minutes ${minutes == 1 ? 'minute' : 'minutes'}';
+    final secondsText = '$seconds ${seconds == 1 ? 'second' : 'seconds'}';
+    if (minutes == 0) return secondsText;
+    if (seconds == 0) return minutesText;
+    return '$minutesText $secondsText';
   }
 }
+
+
+
+

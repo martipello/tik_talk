@@ -41,4 +41,9 @@ class SettingsNotifier extends _$SettingsNotifier {
     state = state.copyWith(countdownSeconds: seconds);
     await _repository.save(state);
   }
+
+  Future<void> updateTtsMuted(bool muted) async {
+    state = state.copyWith(ttsMuted: muted);
+    await _repository.save(state);
+  }
 }

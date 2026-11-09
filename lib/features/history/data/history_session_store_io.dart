@@ -20,15 +20,23 @@ class SqfliteHistorySessionStore implements HistorySessionStore {
 
     final opened = await openDatabase(
       databasePath,
-      version: 1,
+      version: 2,
       onCreate: (database, version) => database.execute('''
         CREATE TABLE sessions (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           completed_at TEXT NOT NULL,
           duration_ms INTEGER NOT NULL,
-          laps_ms TEXT NOT NULL
+          laps_ms TEXT NOT NULL,
+          laps_json TEXT,
+          label TEXT
         )
       '''),
+      onUpgrade: (database, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await database.execute('ALTER TABLE sessions ADD COLUMN laps_json TEXT');
+          await database.execute('ALTER TABLE sessions ADD COLUMN label TEXT');
+        }
+      },
     );
     _database = opened;
     return opened;
@@ -45,6 +53,17 @@ class SqfliteHistorySessionStore implements HistorySessionStore {
   Future<void> insert(TimerSession session) async {
     final database = await _open();
     await database.insert('sessions', session.toMap()..remove('id'));
+  }
+
+  @override
+  Future<void> update(TimerSession session) async {
+    final database = await _open();
+    await database.update(
+      'sessions',
+      session.toMap()..remove('id'),
+      where: 'id = ?',
+      whereArgs: [session.id],
+    );
   }
 
   @override

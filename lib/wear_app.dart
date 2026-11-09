@@ -19,6 +19,14 @@ class TikTalkWearApp extends ConsumerWidget {
       themeMode: ThemeMode.dark,
       theme: AppTheme.dark(accentColor),
       darkTheme: AppTheme.dark(accentColor),
+      // Horizontal swipe-paging (Timer/History/Settings) got dropped: on
+      // device it kept losing the gesture to Wear OS's own back handling,
+      // which treats a lot of horizontal drags as "leave the app" rather
+      // than "change page," with no reliable way to tell it not to. Timer
+      // is the only home now; History/Settings are ordinary pushed routes
+      // reached by tapping an icon on it, and the system's edge-swipe
+      // gesture becomes a normal (and this time actually reliable) back
+      // instead of fighting it.
       home: const WearTimerScreen(),
     );
   }
