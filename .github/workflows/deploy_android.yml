@@ -1,0 +1,120 @@
+name: Deploy Android to Google Play
+
+# Deliberately workflow_dispatch + push-to-main only, not pull_request -
+# this uploads to Play Store using a secret, which a PR (including from a
+# fork) should never be able to trigger.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  checks: write
+  contents: read
+  id-token: write
+  pull-requests: write
+
+jobs:
+  build_and_deploy_mobile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.38.3
+      - name: Cache Android SDK components
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/android/sdk/ndk
+            /usr/local/lib/android/sdk/platforms
+            /usr/local/lib/android/sdk/cmake
+          key: android-sdk-3.38.3-${{ hashFiles('android/**/*.gradle*') }}
+          restore-keys: android-sdk-3.38.3-
+      - run: flutter pub get
+      - run: flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Calculate Build Number
+        run: echo "MOBILE_BUILD_NUMBER=$(( ${{ github.run_number }} + 100 ))" >> $GITHUB_ENV
+      - name: Build Prod Release
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m"
+        run: flutter build appbundle --release -t lib/main_prod.dart --flavor prod --build-number=${{ env.MOBILE_BUILD_NUMBER }}
+      - name: Upload Mobile App To Google Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: '${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_SECRET }}'
+          packageName: com.sealstudios.tik_talk
+          releaseFiles: build/app/outputs/bundle/prodRelease/app-prod-release.aab
+          track: internal
+          inAppUpdatePriority: 1
+          whatsNewDirectory: distribution/whatsnew
+          mappingFile: build/app/outputs/mapping/prodRelease/mapping.txt
+          debugSymbols: build/app/intermediates/merged_native_libs/prodRelease/mergeProdReleaseNativeLibs/out/lib
+          changesNotSentForReview: false
+
+  build_and_deploy_wear:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.38.3
+      - name: Cache Android SDK components
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/android/sdk/ndk
+            /usr/local/lib/android/sdk/platforms
+            /usr/local/lib/android/sdk/cmake
+          key: android-sdk-3.38.3-${{ hashFiles('android/**/*.gradle*') }}
+          restore-keys: android-sdk-3.38.3-
+      - run: flutter pub get
+      - run: flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Calculate Build Number
+        # Offset well clear of the mobile range above - both flavors share
+        # one Play Console app (same packageName, different track), which
+        # means they also share ONE versionCode namespace across the whole
+        # app. Without this offset, a wear build and a mobile build from
+        # the same CI run number would collide.
+        run: echo "WEAR_BUILD_NUMBER=$(( ${{ github.run_number }} + 100 + 10000 ))" >> $GITHUB_ENV
+      - name: Build Wear Release
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m"
+        run: flutter build appbundle --release -t lib/main_wear.dart --flavor wear --build-number=${{ env.WEAR_BUILD_NUMBER }}
+      - name: Upload Wear App To Google Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: '${{ secrets.GOOGLE_CLOUD_SERVICE_ACCOUNT_SECRET }}'
+          packageName: com.sealstudios.tik_talk
+          releaseFiles: build/app/outputs/bundle/wearRelease/app-wear-release.aab
+          track: wear:internal
+          inAppUpdatePriority: 1
+          whatsNewDirectory: distribution/whatsnew
+          mappingFile: build/app/outputs/mapping/wearRelease/mapping.txt
+          changesNotSentForReview: false

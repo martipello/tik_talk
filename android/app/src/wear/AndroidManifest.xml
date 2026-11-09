@@ -1,4 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- Required: tells Google Play this AAB is for Wear OS devices only -->
     <uses-feature android:name="android.hardware.type.watch" android:required="true" />
+
+    <application>
+        <!-- Required: tells Google Play this app works fully on its own,
+             with no paired phone/companion app needed - which is true
+             here, the whole timer runs standalone on the watch. Without
+             this, Play can treat the app as a phone-companion build and
+             distribute/list it differently. -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="true" />
+    </application>
 </manifest>
