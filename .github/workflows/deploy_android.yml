@@ -30,6 +30,11 @@ jobs:
           large-packages: true
           docker-images: true
           swap-storage: true
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -80,6 +85,11 @@ jobs:
           large-packages: true
           docker-images: true
           swap-storage: true
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
