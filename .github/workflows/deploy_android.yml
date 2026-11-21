@@ -53,6 +53,15 @@ jobs:
       - run: flutter pub run build_runner build --delete-conflicting-outputs
       - name: Calculate Build Number
         run: echo "MOBILE_BUILD_NUMBER=$(( ${{ github.run_number }} + 100 ))" >> $GITHUB_ENV
+      - name: Write release signing config
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/release.jks"
+          cat > android/key.properties <<EOF
+          storeFile=$RUNNER_TEMP/release.jks
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
       - name: Build Prod Release
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m"
@@ -113,6 +122,15 @@ jobs:
         # app. Without this offset, a wear build and a mobile build from
         # the same CI run number would collide.
         run: echo "WEAR_BUILD_NUMBER=$(( ${{ github.run_number }} + 100 + 10000 ))" >> $GITHUB_ENV
+      - name: Write release signing config
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > "$RUNNER_TEMP/release.jks"
+          cat > android/key.properties <<EOF
+          storeFile=$RUNNER_TEMP/release.jks
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          EOF
       - name: Build Wear Release
         env:
           GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4096m -XX:MaxMetaspaceSize=512m"
