@@ -33,8 +33,14 @@ class WearHistoryScreen extends ConsumerWidget {
           data: (sessions) => sessions.isEmpty
               ? Column(
                   children: [
+                    // Same bezel-clearance padding as the non-empty branch
+                    // below and wear_settings_screen.dart - EdgeInsets.all(12)
+                    // here clipped the back arrow against the round bezel.
                     Padding(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 28,
+                        vertical: 44,
+                      ),
                       child: backButton,
                     ),
                     const Expanded(
@@ -78,7 +84,13 @@ class WearHistoryScreen extends ConsumerWidget {
                 ),
           error: (error, stackTrace) => Column(
             children: [
-              Padding(padding: const EdgeInsets.all(12), child: backButton),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 44,
+                ),
+                child: backButton,
+              ),
               const Expanded(
                 child: Center(
                   child: Text('Failed to load', style: TextStyle(fontSize: 13)),
@@ -88,7 +100,13 @@ class WearHistoryScreen extends ConsumerWidget {
           ),
           loading: () => Column(
             children: [
-              Padding(padding: const EdgeInsets.all(12), child: backButton),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 44,
+                ),
+                child: backButton,
+              ),
               const Expanded(child: Center(child: CircularProgressIndicator())),
             ],
           ),
